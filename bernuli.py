@@ -1,4 +1,6 @@
 import random
+import random 
+import matplotlib.pyplot as plt
 #funcion de bernulli 
 theta = 0.7
 x_n = [random.uniform(0,1) for x in range(100)]
@@ -15,6 +17,10 @@ for numero in x_n:
 print("total de soles = ",soles)
 print("total de aguilas = ",aguilas)
 
+par= [soles,aguilas ]
+fig,ax = plt.subplots()
+ax.bar(x=range(len(par)),height=par)
+plt.show()
 
 
 
