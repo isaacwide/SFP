@@ -9,7 +9,7 @@ soles = 0
 aguilas =0 
 
 for numero in x_n:
-    if numero > 0 and numero < theta :
+    if  numero < theta :
         aguilas += 1
     else:
         soles += 1 

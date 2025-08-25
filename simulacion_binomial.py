@@ -11,17 +11,18 @@ def simple():
     x_n = [random.uniform(0,1) for x in range(100)]
     soles = 0
     for numero in x_n:
-        if numero > 0 and numero < theta :
+        if  numero < theta :
             soles += 1
     pass
     return soles 
 
-for i in range(100000):
+for i in range(10000):
     histograma.append(simple()) 
     
 
 #grafico de barras 
-fig,ax = plt.subplots()
-ax.bar(x=range(len(histograma)),height=histograma)
-plt.savefig('figure.png')
+fig, ax = plt.subplots()
+ax.hist(histograma, bins=20, edgecolor="black", density=True)
+ax.set_xlabel("Número de soles (éxitos)")
+ax.set_ylabel("Frecuencia relativa")
 plt.show()
