@@ -2,7 +2,7 @@ import random
 import matplotlib.pyplot as plt
 #sumulacionde una funcionde destribucion binomial 
 
-theta = 0.5
+theta = 0.2
 
 #numero de repeticiones 
 histograma = []
