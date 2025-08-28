@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo }}</title>
+
+</head>
+<body>
+    <div class="container">
+        <h1>{{ titulo }}</h1>
+        
+        {% if soles is defined and aguilas is defined %}
+        <div class="resultado">
+            <h3>Resultados:</h3>
+            <p><strong>Total de soles:</strong> {{ soles }}</p>
+            <p><strong>Total de águilas:</strong> {{ aguilas }}</p>
+        </div>
+        {% endif %}
+        
+        {% if datos is defined %}
+        <div class="resultado">
+            <h3>Frecuencias por cara:</h3>
+            {% for i in range(datos|length) %}
+            <p><strong>Cara {{ i + 1 }}:</strong> {{ datos[i] }}</p>
+            {% endfor %}
+            <p><strong>Total:</strong> {{ datos|sum }}</p>
+        </div>
+        {% endif %}
+        
+        {% if promedio is defined %}
+        <div class="resultado">
+            <h3>Estadísticas:</h3>
+            <p><strong>Promedio de éxitos:</strong> {{ promedio }}</p>
+            <p><strong>Total de simulaciones:</strong> {{ total_simulaciones }}</p>
+        </div>
+        {% endif %}
+        
+        <div class="grafico">
+            <img src="{{ url_for('static', filename='images/' + imagen) }}" alt="Gráfico de {{ titulo }}">
+        </div>
+        
+        <a href="/" class="back-button">Volver al inicio</a>
+    </div>
+</body>
+</html>
