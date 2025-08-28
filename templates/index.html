@@ -4,70 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulaciones Estadísticas</title>
-        <style>
-        /* Reset básico */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f8fa;
-            color: #333;
-            padding: 20px;
-            text-align: center;
-        }
-
-
-
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-
-        p {
-            margin-bottom: 30px;
-            font-size: 1.1em;
-        }
-
-        .button-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-        }
-
-        .sim-button {
-            text-decoration: none;
-            background-color: #3498db;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-
-        .sim-button:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-        }
-
-        @media (max-width: 500px) {
-            .container {
-                padding: 25px 20px;
-            }
-
-            h1 {
-                font-size: 22px;
-            }
-
-            .sim-button {
-                font-size: 0.95em;
-                padding: 12px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/c1.css') }}">
 </head>
 <body>
     <div class="container">
