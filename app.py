@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 from flask_cors import CORS
 import os,base64,random
-from fuctions import bernuli,exponencial, multinomial, simulacion_binomial # importa las funciones des la carpeta fuctions
+from fuctions import bernuli,exponencial, multinomial, norm, simulacion_binomial,norm  # importa las funciones des la carpeta fuctions
 
 app = Flask(__name__)
 CORS(app)
@@ -168,6 +168,61 @@ def binomial():
                          theta=theta,
                          lanzamientos=lanzamientos,
                          repeticiones=repeticiones)
+
+@app.route('/normal',methods=['GET', 'POST'])
+def normal():
+    #valor por defecto 
+    repeticiones = 100
+    miu = 0
+    sigma = 1
+    if request.method == 'POST':
+        repeticiones = int(request.form.get('repeticiones', 100))
+        miu = float(request.form.get('miu'))
+        sigma = float(request.form.get('sigma'))
+
+    if sigma <= 0:
+        sigma = 1
+
+    valores = norm.normalEstandar(repeticiones,miu,sigma)
+    plt.figure()
+    fig, ax = plt.subplots()
+    fig, ax = plt.subplots()
+    ax.hist(valores, bins=50, edgecolor="black", density=True)
+    ax.set_xlabel("Valores simulados (N(0,1))")
+    ax.set_ylabel("Frecuencia relativa")
+    plt.show()
+    img = BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    plt.close() 
+
+    img_str = base64.b64encode(img.getvalue()).decode('ascii')
+
+    return render_template('resultado.html',
+                         titulo='Distribución Normal',
+                         imagen=img_str,
+                         distribucion='normal',
+                         miu=miu,
+                        sigma=sigma,
+                         )
+
+
+@app.route('/gebbs',methods=['GET', 'POST'])
+def gebbs_method():
+    return render_template('resultado.html',
+                         titulo='Método de Gebbs',
+                         distribucion='gebbs',
+                         )
+
+@app.route("/api/gebbs", methods=["POST"])
+def gebbs_api():
+    data = request.json
+    x = data["x"]
+    y = data["y"]
+    n = data["n"]
+
+    # aquí podrías calcular en Python o solo regresar lo que JS necesita
+    return {"x": x, "y": y, "n": n}
 
 if __name__ == '__main__':
     app.run(debug=True,port=8080)
