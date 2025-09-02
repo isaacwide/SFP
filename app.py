@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import matplotlib.pyplot as plt
 from io import BytesIO
 from flask_cors import CORS
@@ -12,6 +12,10 @@ CORS(app)
 ##debende importar request de flask
 ##los metodos get y post son para mandar datos desde el html al servidor o recibir datos del servidor al html
 
+
+app = Flask(__name__)
+CORS(app)
+
 ## esta es la ruta principal que carga el index.html
 @app.route('/')
 def index():
@@ -19,18 +23,25 @@ def index():
 
 @app.route('/bernoulli',methods=['GET', 'POST'])
 def bernoulli():
-    #introducir theta como parametro
-    soles, aguilas = bernuli.simBernoulli(theta=0.3,n=10000)
+    # Valores por defecto
+    theta = 0.3
+    n = 10000
+    
+    # valores del usuario
+    if request.method == 'POST':
+        theta = float(request.form.get('theta', 0.3))
+        n = int(request.form.get('n', 10000))
+    
+    soles, aguilas = bernuli.simBernoulli(theta=theta, n=n)
     par = [soles, aguilas]
 
-    # guardar la imagen en memoria
     # Crear el gráfico
     plt.figure()
     fig, ax = plt.subplots()
     ax.bar(x=range(len(par)), height=par)
     ax.set_xticks([0, 1])
     ax.set_xticklabels(['Soles', 'Águilas'])
-    plt.title('Distribución de Bernoulli')      
+    plt.title(f'Distribución de Bernoulli (θ={theta}, n={n})')      
     img = BytesIO()
     plt.savefig(img, format='png')
     img.seek(0)
@@ -42,20 +53,29 @@ def bernoulli():
                          titulo='Distribución de Bernoulli',
                          soles=soles, 
                          aguilas=aguilas,
-                         imagen=img_str)
-
-
+                         imagen=img_str,
+                         distribucion='bernoulli',
+                         theta=theta,
+                         n=n)
 
 @app.route('/exponencial',methods=['GET', 'POST'])
 def exponential():
-    #introducir lmbda y n como parametros
-    ns= exponencial.simExponencial(lmbda=0.5,n=100)
+    # Valores por defecto
+    lmbda = 0.5
+    n = 100
+    
+    # valores del usuario
+    if request.method == 'POST':
+        lmbda = float(request.form.get('lambda', 0.5))
+        n = int(request.form.get('n', 100))
+    
+    ns = exponencial.simExponencial(lmbda=lmbda, n=n)
 
-    #generamos la imagen 
+    # Generar la imagen 
     plt.figure()
     fig, ax = plt.subplots()
     ax.hist(ns, bins=20, edgecolor='black', density=True)  
-    plt.title('Distribución Exponencial')
+    plt.title(f'Distribución Exponencial (λ={lmbda}, n={n})')
     plt.xlabel('Valores')
     plt.ylabel('Frecuencia relativa')
     img = BytesIO()
@@ -65,24 +85,36 @@ def exponential():
     img_str = base64.b64encode(img.getvalue()).decode('ascii')
 
     return render_template('resultado.html',
-                         titulo='Distribución Exponencial ', 
-                         ns='aguilas',
-                         imagen= img_str)
-
+                         titulo='Distribución Exponencial',
+                         imagen=img_str,
+                         distribucion='exponencial',
+                         lmbda=lmbda,
+                         n=n)
 
 @app.route('/multinomial',methods=['GET', 'POST'])
 def multi():
-    #esta parte el usuario ingresa la cantidad de simulaciones y los rangos
-    histograma = multinomial.simMultinomial(n=10000,rangos = [random.uniform(0,1) for _ in range(5)])
-    #generamos la imagen del histograma
+    # Valores por defecto
+    n = 10000
+    caras = 5
+    
+    # valores del usuario
+    if request.method == 'POST':
+        n = int(request.form.get('n', 10000))
+        caras = int(request.form.get('caras', 5))
+    
+    # Generar rangos aleatorios para las probabilidades
+    rangos = [random.uniform(0,1) for _ in range(caras)]
+    histograma = multinomial.simMultinomial(n=n, rangos=rangos)
+    
+    # Generar la imagen del histograma
     plt.figure()
     fig, ax = plt.subplots()
     ax.bar(x=range(len(histograma)), height=histograma)
     ax.set_xlabel('Cara del dado')
     ax.set_ylabel('Frecuencia')
-    ax.set_xticks(range(6))
-    ax.set_xticklabels([f'Cara {i+1}' for i in range(6)])
-    plt.title('Distribución Multinomial (Dado)')
+    ax.set_xticks(range(len(histograma)))
+    ax.set_xticklabels([f'Cara {i+1}' for i in range(len(histograma))])
+    plt.title(f'Distribución Multinomial ({caras} caras, n={n})')
     img = BytesIO()
     plt.savefig(img, format='png')
     img.seek(0)
@@ -90,31 +122,40 @@ def multi():
 
     img_str = base64.b64encode(img.getvalue()).decode('ascii')
 
-
     return render_template('resultado.html',
                          titulo='Distribución Multinomial',
                          datos=histograma,
-                         imagen=img_str)
-
-
+                         imagen=img_str,
+                         distribucion='multinomial',
+                         n=n,
+                         caras=caras)
 
 @app.route('/binomial',methods=['GET', 'POST'])
 def binomial():
-    #introducir theta, lanzamientos y repeticiones como parametros
-    histograma, promedio = simulacion_binomial.simBinomial(theta=0.7,lanzamientos=10,repeticiones=1000)
-    #generamos la imagen del histograma
-     # Crear el gráfico
+    # Valores por defecto
+    theta = 0.7
+    lanzamientos = 10
+    repeticiones = 1000
+    
+    # valores del usuario
+    if request.method == 'POST':
+        theta = float(request.form.get('theta', 0.7))
+        lanzamientos = int(request.form.get('lanzamientos', 10))
+        repeticiones = int(request.form.get('repeticiones', 1000))
+    
+    histograma, promedio = simulacion_binomial.simBinomial(theta=theta, lanzamientos=lanzamientos, repeticiones=repeticiones)
+    
+    # Crear el gráfico
     plt.figure()
     fig, ax = plt.subplots()
     ax.hist(histograma, bins=20, edgecolor="black", density=True)
     ax.set_xlabel("Número de soles (éxitos)")
     ax.set_ylabel("Frecuencia relativa")
-    plt.title('Distribución Binomial')
+    plt.title(f'Distribución Binomial (θ={theta}, n={lanzamientos}, rep={repeticiones})')
     img = BytesIO()
     plt.savefig(img, format='png')
     img.seek(0)
     plt.close()
-
 
     img_str = base64.b64encode(img.getvalue()).decode('ascii')
 
@@ -122,7 +163,11 @@ def binomial():
                          titulo='Distribución Binomial',
                          promedio=round(promedio, 2),
                          total_simulaciones=len(histograma),
-                         imagen=img_str)
+                         imagen=img_str,
+                         distribucion='binomial',
+                         theta=theta,
+                         lanzamientos=lanzamientos,
+                         repeticiones=repeticiones)
 
 if __name__ == '__main__':
     app.run(debug=True,port=8080)

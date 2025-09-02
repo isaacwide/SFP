@@ -24,7 +24,7 @@
         .main-container {
             max-width: 1400px;
             margin: 0 auto;
-            background: rgba(251, 251, 251, 0.95);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
@@ -215,6 +215,81 @@
             }
         }
 
+        /* Estilos del formulario */
+        .param-form {
+            margin-top: 15px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e6ed;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .input-group small {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .update-button {
+            width: 100%;
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.3);
+            margin-top: 10px;
+        }
+
+        .update-button:hover {
+            background: linear-gradient(135deg, #229954 0%, #1e8449 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
+        }
+
+        .percentage-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #2ecc71;
+        }
+
+        .percentage-info p {
+            margin: 5px 0;
+            color: #27ae60;
+            font-weight: 500;
+        }
+
         /* Animaciones */
         .info-card {
             animation: slideInLeft 0.6s ease-out;
@@ -259,9 +334,75 @@
             <!-- Panel Izquierdo - Información y Controles -->
             <div class="left-panel">
                 
+                <!-- Formulario de Parámetros -->
+                <div class="info-card">
+                    <h3>⚙️ Parámetros de Simulación</h3>
+                    <form method="POST" class="param-form">
+                        
+                        {% if distribucion == 'bernoulli' %}
+                        <div class="input-group">
+                            <label for="theta">Probabilidad (θ):</label>
+                            <input type="number" id="theta" name="theta" min="0" max="1" step="0.01" value="{{ theta }}" required>
+                            <small>Probabilidad de éxito (0-1)</small>
+                        </div>
+                        <div class="input-group">
+                            <label for="n">Número de simulaciones:</label>
+                            <input type="number" id="n" name="n" min="100" max="100000" value="{{ n }}" required>
+                            <small>Cantidad de experimentos</small>
+                        </div>
+                        {% endif %}
+
+                        {% if distribucion == 'exponencial' %}
+                        <div class="input-group">
+                            <label for="lambda">Lambda (λ):</label>
+                            <input type="number" id="lambda" name="lambda" min="0.1" max="10" step="0.1" value="{{ lmbda }}" required>
+                            <small>Parámetro de tasa</small>
+                        </div>
+                        <div class="input-group">
+                            <label for="n">Número de muestras:</label>
+                            <input type="number" id="n" name="n" min="50" max="10000" value="{{ n }}" required>
+                            <small>Cantidad de valores a generar</small>
+                        </div>
+                        {% endif %}
+
+                        {% if distribucion == 'multinomial' %}
+                        <div class="input-group">
+                            <label for="n">Número de simulaciones:</label>
+                            <input type="number" id="n" name="n" min="1000" max="100000" value="{{ n }}" required>
+                            <small>Cantidad de experimentos</small>
+                        </div>
+                        <div class="input-group">
+                            <label for="caras">Número de caras:</label>
+                            <input type="number" id="caras" name="caras" min="2" max="20" value="{{ caras }}" required>
+                            <small>Caras del dado (2-20)</small>
+                        </div>
+                        {% endif %}
+
+                        {% if distribucion == 'binomial' %}
+                        <div class="input-group">
+                            <label for="theta">Probabilidad (θ):</label>
+                            <input type="number" id="theta" name="theta" min="0" max="1" step="0.01" value="{{ theta }}" required>
+                            <small>Probabilidad de éxito</small>
+                        </div>
+                        <div class="input-group">
+                            <label for="lanzamientos">Lanzamientos por experimento:</label>
+                            <input type="number" id="lanzamientos" name="lanzamientos" min="1" max="100" value="{{ lanzamientos }}" required>
+                            <small>Número de intentos por simulación</small>
+                        </div>
+                        <div class="input-group">
+                            <label for="repeticiones">Repeticiones:</label>
+                            <input type="number" id="repeticiones" name="repeticiones" min="100" max="10000" value="{{ repeticiones }}" required>
+                            <small>Número de experimentos</small>
+                        </div>
+                        {% endif %}
+
+                        <button type="submit" class="update-button">🔄 Actualizar Simulación</button>
+                    </form>
+                </div>
+                
                 {% if soles is defined and aguilas is defined %}
                 <div class="info-card">
-                    <h3>Resultados de Simulación</h3>
+                    <h3>📊 Resultados de Simulación</h3>
                     <div class="stats-grid">
                         <div class="stat-item">
                             <div class="stat-value">{{ soles }}</div>
@@ -272,12 +413,16 @@
                             <div class="stat-label">Águilas</div>
                         </div>
                     </div>
+                    <div class="percentage-info">
+                        <p><strong>Porcentaje de soles:</strong> {{ "%.1f"|format((soles/(soles+aguilas))*100) }}%</p>
+                        <p><strong>Porcentaje de águilas:</strong> {{ "%.1f"|format((aguilas/(soles+aguilas))*100) }}%</p>
+                    </div>
                 </div>
                 {% endif %}
                 
                 {% if datos is defined %}
                 <div class="info-card">
-                    <h3>Frecuencias por Cara</h3>
+                    <h3>📈 Frecuencias por Cara</h3>
                     {% for i in range(datos|length) %}
                     <p><strong>Cara {{ i + 1 }}:</strong> <span style="color: #2980b9; font-weight: bold;">{{ datos[i] }}</span></p>
                     {% endfor %}
@@ -289,7 +434,7 @@
                 
                 {% if promedio is defined %}
                 <div class="info-card">
-                    <h3>Estadísticas Generales</h3>
+                    <h3>📈 Estadísticas Generales</h3>
                     <div class="stats-grid">
                         <div class="stat-item">
                             <div class="stat-value">{{ "%.2f"|format(promedio) }}</div>
