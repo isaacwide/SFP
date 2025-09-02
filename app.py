@@ -209,20 +209,10 @@ def normal():
 
 @app.route('/gebbs',methods=['GET', 'POST'])
 def gebbs_method():
-    return render_template('resultado.html',
+    return render_template('grafic3d.html',
                          titulo='Método de Gebbs',
                          distribucion='gebbs',
                          )
-
-@app.route("/api/gebbs", methods=["POST"])
-def gebbs_api():
-    data = request.json
-    x = data["x"]
-    y = data["y"]
-    n = data["n"]
-
-    # aquí podrías calcular en Python o solo regresar lo que JS necesita
-    return {"x": x, "y": y, "n": n}
 
 if __name__ == '__main__':
     app.run(debug=True,port=8080)
