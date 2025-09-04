@@ -91,7 +91,7 @@ def multi():
     # Valores por defecto
     n = 10000
     caras = 5
-    
+    uniforme = False
     # valores del usuario
     if request.method == 'POST':
         n = int(request.form.get('n', 10000))
