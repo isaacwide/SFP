@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulación de Gebbs</title>
+</head>
+<body>
+    <p>Simulación de gebbs con JavaScript</p>
+    <div id="grafica3d" style="width:600px; height:600px;"></div>
+
+    <script>
+        // Función x_y(y)
+        function x_y(y) {
+            let u_1 = Math.random();
+            let delta1 = Math.sqrt(Math.max((4 * (y ** 2)) + (12 * y) + 4 + (32 * u_1) + (24 * y * u_1), 0));
+            return ((-(3 * y) - 2 + delta1) / 2);
+        }
+
+        // Función y_x(x)
+        function y_x(x) {
+            let u_1 = Math.random();
+            let delta2 = Math.sqrt(Math.max((x ** 2) + (2 * x) + 1 + (6 * u_1 * x) + (15 * x), 0));
+            return ((-(2 * x) - 2 + (2 * delta2)) / 3);
+        }
+
+        // Función gebbs(n)
+        function gebbs(n) {
+            let x0 = Math.floor(Math.random() * 11);
+            let y0 = Math.floor(Math.random() * 11);
+            let samples = [[x0, y0]];
+
+            for (let i = 0; i < n; i++) {
+                let x_n = x_y(samples[i][1]);
+                let y_n = y_x(samples[i][0]);
+                samples.push([x_n, y_n]);
+            }
+            return samples;
+        }
+
+        // Generamos los datos
+        let samples = gebbs(1000);
+
+        // Separamos en listas x, y y un z artificial
+        let x_vals = samples.map(p => p[0]);
+        let y_vals = samples.map(p => p[1]);
+        let z_vals = samples.map((p, i) => i); // z = índice de la iteración
+
+        // Definimos el trace de Plotly
+        let trace = {
+            x: x_vals,
+            y: y_vals,
+            z: z_vals,
+            mode: 'markers',
+            type: 'scatter3d',
+            marker: { size: 3, color: z_vals, colorscale: 'Viridis' }
+        };
+
+        let layout = {
+            margin: { l: 0, r: 0, b: 0, t: 0 }
+        };
+
+        // Dibujamos
+        Plotly.newPlot('grafica3d', [trace], layout);
+    </script>
+</body>
+</html>
