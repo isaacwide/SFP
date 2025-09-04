@@ -61,7 +61,13 @@
                             <input type="number" id="caras" name="caras" min="2" max="20" value="{{ caras }}" required>
                             <small>Caras del dado (2-20)</small>
                         </div>
+                        <div class="input-group">
+                            <input type="checkbox" id="uniforme" name="uniforme" value="1"
+                                {% if uniforme %}checked{% endif %}>
+                            <label for="uniforme">Usar probabilidades uniformes</label>
+                        </div>
                         {% endif %}
+
 
                         {% if distribucion == 'binomial' %}
                         <div class="input-group">

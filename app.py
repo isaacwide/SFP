@@ -11,11 +11,6 @@ CORS(app)
 ##para llmar algo del html aca se usa request.form['nombre del input']
 ##debende importar request de flask
 ##los metodos get y post son para mandar datos desde el html al servidor o recibir datos del servidor al html
-
-
-app = Flask(__name__)
-CORS(app)
-
 ## esta es la ruta principal que carga el index.html
 @app.route('/')
 def index():
@@ -101,10 +96,9 @@ def multi():
     if request.method == 'POST':
         n = int(request.form.get('n', 10000))
         caras = int(request.form.get('caras', 5))
-    
-    # Generar rangos aleatorios para las probabilidades
-    rangos = [random.uniform(0,1) for _ in range(caras)]
-    histograma = multinomial.simMultinomial(n=n, rangos=rangos)
+        uniforme = request.form.get('uniforme') == '1'  # ✅
+
+    histograma = multinomial.simMultinomial(n=n, rangos=caras, uniforme=uniforme)
     
     # Generar la imagen del histograma
     plt.figure()
@@ -113,7 +107,7 @@ def multi():
     ax.set_xlabel('Cara del dado')
     ax.set_ylabel('Frecuencia')
     ax.set_xticks(range(len(histograma)))
-    ax.set_xticklabels([f'Cara {i+1}' for i in range(len(histograma))])
+    ax.set_xticklabels([f' {i+1}' for i in range(len(histograma))])
     plt.title(f'Distribución Multinomial ({caras} caras, n={n})')
     img = BytesIO()
     plt.savefig(img, format='png')

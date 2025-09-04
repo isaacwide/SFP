@@ -1,22 +1,24 @@
 import random
-import matplotlib.pyplot as plt
-import matplotlib
-matplotlib.use('Agg')
+import numpy as np
 
-def simMultinomial(n,rangos):
-    histograma = [0]*6
-    n_k = [random.uniform(0,1) for _ in range(n)]
-    for n in n_k:
-        if n >= 0 and n < rangos[0]:
-            histograma[0] += 1
-        elif n >= rangos[0] and n < rangos[1]:
-            histograma[1] += 1
-        elif n >= rangos[1] and n < rangos[2]:
-            histograma[2] += 1
-        elif n >= rangos[2] and n < rangos[3]:
-            histograma[3] += 1
-        elif n >= rangos[3] and n < rangos[4]:
-            histograma[4] += 1
-        else:
-            histograma[5] += 1
+def simMultinomial(n, rangos, uniforme):
+    if uniforme:
+        probabilidades = [1/rangos] * rangos
+    else:
+       
+        probabilidades = np.random.dirichlet(np.ones(rangos), size=1)[0]
+
+    histograma = [0] * rangos
+
+    muestras = [random.uniform(0,1) for _ in range(n)]
+    intervalos = [0] + list(np.cumsum(probabilidades))
+
+    for u in muestras:  # <-- corregido nombre
+        for i in range(len(intervalos)-1):
+            if intervalos[i] <= u < intervalos[i+1]:
+                histograma[i] += 1
+                break
+
+    print("Probabilidades:", probabilidades)
+    print("Histograma:", histograma)
     return histograma
