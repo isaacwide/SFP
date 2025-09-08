@@ -147,6 +147,15 @@
                     </div>
                 </div>
                 {% endif %}
+                {% if datos_descarga is defined %}
+                <div class="info-card">
+                    <h3>💾 Descargar Datos</h3>
+                    <form action="/descargar_datos/{{ distribucion }}" method="POST">
+                        <input type="hidden" name="datos" value="{{ datos_descarga }}">
+                        <button type="submit" class="download-button">⬇️ Descargar TXT</button>
+                    </form>
+                </div>
+                {% endif %}
                 
                 {% if datos is defined %}
                 <div class="info-card">
