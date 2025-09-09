@@ -4,21 +4,328 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulaciones Estadísticas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/c1.css') }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #212674;
+            line-height: 1.6;
+            color: #334155;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fdfdfd;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #7a8eaa;
+            margin-bottom: 12px;
+        }
+
+        .description {
+            font-size: 1rem;
+            color: #7a8eaa;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .distributions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .distribution-card {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        .distribution-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-color: #cbd5e1;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-right: 12px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .card-description {
+            color: #64748b;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .card-params {
+            display: flex;
+            gap: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .param-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .param-value {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .param-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        /* Colores de acento para cada distribución */
+        .bernoulli .card-icon { color: #dc2626; }
+        .exponencial .card-icon { color: #059669; }
+        .multinomial .card-icon { color: #2563eb; }
+        .binomial .card-icon { color: #7c3aed; }
+        .normal .card-icon { color: #ea580c; }
+        .gebbs .card-icon { color: #db2777; }
+
+        .bernoulli:hover { border-color: #dc2626; }
+        .exponencial:hover { border-color: #059669; }
+        .multinomial:hover { border-color: #2563eb; }
+        .binomial:hover { border-color: #7c3aed; }
+        .normal:hover { border-color: #ea580c; }
+        .gebbs:hover { border-color: #db2777; }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 16px;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .distributions-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .distribution-card {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .title {
+                font-size: 1.75rem;
+            }
+
+            .card-params {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .param-item {
+                text-align: left;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Simulaciones de Distribuciones Estadísticas</h1>
-        <p>Selecciona una simulación para ejecutar:</p>
-        
-        <div class="button-grid">
-            <a href="/bernoulli" class="sim-button">Distribución de Bernoulli</a>
-            <a href="/exponencial" class="sim-button">Distribución Exponencial</a>
-            <a href="/multinomial" class="sim-button">Distribución Multinomial</a>
-            <a href="/binomial" class="sim-button">Distribución Binomial</a>
-            <a href="/normal" class="sim-button">Distribución Normal</a>
-            <a href="/gebbs" class="sim-button">Simulacion de gebbs</a>
-        </div>
+        <header class="header">
+            <h1 class="title">Simulaciones Estadísticas</h1>
+            <p class="subtitle">Explora el mundo de las distribuciones</p>
+            <p class="description">
+                Experimenta con diferentes distribuciones estadísticas de manera interactiva. 
+                Ajusta parámetros y observa los resultados en tiempo real.
+            </p>
+        </header>
+
+        <main class="distributions-grid">
+            <a href="/bernoulli" class="distribution-card bernoulli">
+                <div class="card-header">
+                    <span class="card-icon">🎯</span>
+                    <h2 class="card-title">Distribución de Bernoulli</h2>
+                </div>
+                <p class="card-description">
+                    Experimento con dos resultados posibles: éxito o fracaso. 
+                    Perfecto para modelar eventos binarios.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">2</span>
+                        <span class="param-label">Resultados</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">θ</span>
+                        <span class="param-label">Parámetro</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/exponencial" class="distribution-card exponencial">
+                <div class="card-header">
+                    <span class="card-icon">⏱</span>
+                    <h2 class="card-title">Distribución Exponencial</h2>
+                </div>
+                <p class="card-description">
+                    Modela el tiempo entre eventos que ocurren de manera continua 
+                    e independiente a una tasa constante.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">∞</span>
+                        <span class="param-label">Rango</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">λ</span>
+                        <span class="param-label">Parámetro</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/multinomial" class="distribution-card multinomial">
+                <div class="card-header">
+                    <span class="card-icon">🎲</span>
+                    <h2 class="card-title">Distribución Multinomial</h2>
+                </div>
+                <p class="card-description">
+                    Generalización de la distribución binomial para múltiples 
+                    categorías. Ideal para dados y eventos con varias opciones.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">N</span>
+                        <span class="param-label">Categorías</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">p₁...pₖ</span>
+                        <span class="param-label">Probabilidades</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/binomial" class="distribution-card binomial">
+                <div class="card-header">
+                    <span class="card-icon">🪙</span>
+                    <h2 class="card-title">Distribución Binomial</h2>
+                </div>
+                <p class="card-description">
+                    Número de éxitos en una secuencia de experimentos 
+                    independientes de Bernoulli con la misma probabilidad.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">n</span>
+                        <span class="param-label">Intentos</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">p</span>
+                        <span class="param-label">Probabilidad</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/normal" class="distribution-card normal">
+                <div class="card-header">
+                    <span class="card-icon">📈</span>
+                    <h2 class="card-title">Distribución Normal</h2>
+                </div>
+                <p class="card-description">
+                    La famosa campana de Gauss. Fundamental en estadística 
+                    y presente en muchos fenómenos naturales.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">μ</span>
+                        <span class="param-label">Media</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">σ²</span>
+                        <span class="param-label">Varianza</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/gebbs" class="distribution-card gebbs">
+                <div class="card-header">
+                    <span class="card-icon">🔬</span>
+                    <h2 class="card-title">Simulación de Gibbs</h2>
+                </div>
+                <p class="card-description">
+                    Método de Monte Carlo para obtener secuencias de observaciones 
+                    de distribuciones multivariadas complejas.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">MCMC</span>
+                        <span class="param-label">Método</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">∞</span>
+                        <span class="param-label">Cadena</span>
+                    </div>
+                </div>
+            </a>
+        </main>
+
+        <footer class="footer">
+            Simulaciones Estadísticas v2.0
+        </footer>
     </div>
 </body>
 </html>
