@@ -22,4 +22,4 @@ def simMultinomial(n, rangos, uniforme):
 
     print("Probabilidades:", probabilidades)
     print("Histograma:", histograma)
-    return histograma, secuencia 
+    return histograma, secuencia ,probabilidades

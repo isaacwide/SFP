@@ -104,7 +104,7 @@ def multi():
         caras = int(request.form.get('caras', 5))
         uniforme = request.form.get('uniforme') == '1'
 
-    histograma, secuencia = multinomial.simMultinomial(n=n, rangos=caras, uniforme=uniforme)
+    histograma, secuencia , probabilidades= multinomial.simMultinomial(n=n, rangos=caras, uniforme=uniforme)
     
     # Generar la imagen del histograma
     plt.figure()
@@ -123,7 +123,10 @@ def multi():
     img_str = base64.b64encode(img.getvalue()).decode('ascii')
 
     # Crear datos para descarga
-    datos_descarga = "\n".join([f"Lanzamiento {i+1}: Cara {resultado+1}" for i, resultado in enumerate(secuencia)])
+    # Guardar también las probabilidades
+    datos_probabilidades = "Probabilidades:\n" + ", ".join([f"Cara {i+1}: {p:.4f}" for i, p in enumerate(probabilidades)])
+    datos_lanzamientos = "\n".join([f"Lanzamiento {i+1}: Cara {resultado+1}" for i, resultado in enumerate(secuencia)])
+    datos_descarga = datos_probabilidades + "\n\n" + datos_lanzamientos
 
     return render_template('resultado.html',
                          titulo='Distribución Multinomial',
