@@ -1,12 +1,12 @@
-function x_y(y) {
-            let u_1 = Math.random();
-            let delta1 = Math.sqrt(Math.max((4 * (y ** 2)) + (12 * y) + 4 + (32 * u_1) + (24 * y * u_1), 0));
-            return ((-(3 * y) - 2 + delta1) / 2);
-        }
+        function x_y(y) {
+                    let u_1 = Math.random();
+                    let delta1 = Math.sqrt(Math.max((4 * (y ** 2)) + (12 * y) + 4 + (32 * u_1) + (24 * y * u_1), 0));
+                    return ((-(3 * y) - 2 + delta1) / 2);
+                }
 
         function y_x(x) {
-            let u_1 = Math.random();
-            let delta2 = Math.sqrt(Math.max((x ** 2) + (2 * x) + 1 + (6 * u_1 * x) + (15 * x), 0));
+            let u= Math.random();
+            let delta2 = Math.sqrt(Math.max((x ** 2) + (2 * x) + 1 + (6 * u * x) + (15 * u), 0));
             return ((-(2 * x) - 2 + (2 * delta2)) / 3);
         }
 
@@ -61,6 +61,15 @@ function x_y(y) {
                         }
                     };
 
+                    let hist2d = {
+                            x: x_vals,
+                            y: y_vals,
+                            type: "histogram2d",
+                            colorscale: "Viridis"
+                        };
+
+                        Plotly.newPlot("grafica3d", [hist2d]);
+
                     // Configuración del layout
                     let layout = {
                         margin: { l: 0, r: 0, b: 0, t: 0 },
@@ -76,6 +85,7 @@ function x_y(y) {
 
                     // Dibujar gráfica
                     Plotly.newPlot('grafica3d', [trace], layout);
+                    Plotly.newPlot("histo3d", [hist2d]);
                 });
             }
         });
