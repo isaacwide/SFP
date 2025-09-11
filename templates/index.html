@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulaciones Estadísticas</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/c1.css') }}">
+</head>
 <body>
     <div class="container">
         <header class="header">
@@ -139,6 +140,29 @@
                     <div class="param-item">
                         <span class="param-value">∞</span>
                         <span class="param-label">Cadena</span>
+                    </div>
+                </div>
+            </a>
+            <a href="/normal_2" class="distribution-card normal2">
+                <div class="card-header">
+                    <span class="card-icon">🔗</span>
+                    <h2 class="card-title">Normal Bivariada</h2>
+                </div>
+                <p class="card-description">
+                    Simulación y muestreo de una distribución normal con dos variables correlacionadas. Explora la relación entre medias, varianzas y covarianza.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">μ₁, μ₂</span>
+                        <span class="param-label">Medias</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">σ₁², σ₂²</span>
+                        <span class="param-label">Varianzas</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">ρ</span>
+                        <span class="param-label">Correlación</span>
                     </div>
                 </div>
             </a>

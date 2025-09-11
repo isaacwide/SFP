@@ -225,6 +225,14 @@ def gebbs_method():
                          titulo='Método de Gebbs',
                          distribucion='gebbs')
 
+
+@app.route('/normal_2', methods=['GET', 'POST'])
+def normal_2():
+    return render_template('grafic3d.html',
+                         titulo='Normal en 2 variables',
+                         distribucion='2normal')
+
+
 @app.route('/descargar_datos/<distribucion>', methods=['POST'])
 def descargar_datos(distribucion):
     datos = request.form.get('datos', '')
