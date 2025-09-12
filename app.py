@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, send_file
 from io import BytesIO, StringIO
+import os   
+import tempfile
 import base64
 import random
 import math
@@ -9,6 +11,7 @@ import matplotlib.pyplot as plt
 from fuctions import bernuli, exponencial, multinomial, norm, simulacion_binomial
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024
 
 @app.route('/')
 def index():
@@ -217,7 +220,11 @@ def normal():
                          distribucion='normal',
                          miu=miu,
                          sigma=sigma,
-                         datos_descarga=datos_descarga)
+                         datos_descarga=datos_descarga,
+                         repeticiones=repeticiones,
+                         varianza=miu,
+                         desviacion=sigma,
+                         )
 
 @app.route('/gebbs', methods=['GET', 'POST'])
 def gebbs_method():
@@ -235,20 +242,47 @@ def normal_2():
 
 @app.route('/descargar_datos/<distribucion>', methods=['POST'])
 def descargar_datos(distribucion):
-    datos = request.form.get('datos', '')
-    filename = f"simulacion_{distribucion}.txt"
-    
-    # Crear archivo en memoria
-    file_obj = StringIO()
-    file_obj.write(datos)
-    file_obj.seek(0)
-    
-    return send_file(
-        BytesIO(file_obj.getvalue().encode('utf-8')),
-        as_attachment=True,
-        download_name=filename,
-        mimetype='text/plain'
-    )
+    temp_filename = None
+    try:
+        datos = request.form.get('datos', '')
+        
+        if not datos and 'datos' in request.form:
+
+            pass
+            
+        filename = f"simulacion_{distribucion}.txt"
+        
+        # Crear archivo temporal
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.txt', encoding='utf-8') as tmp_file:
+            tmp_file.write(datos)
+            temp_filename = tmp_file.name
+        
+        # Función de limpieza
+        def cleanup():
+            try:
+                if temp_filename and os.path.exists(temp_filename):
+                    os.unlink(temp_filename)
+            except:
+                pass
+        
+        response = send_file(
+            temp_filename,
+            as_attachment=True,
+            download_name=filename,
+            mimetype='text/plain'
+        )
+        
+        response.call_on_close(cleanup)
+        return response
+        
+    except Exception as e:
+        # Limpieza en caso de error
+        if temp_filename and os.path.exists(temp_filename):
+            try:
+                os.unlink(temp_filename)
+            except:
+                pass
+        return f"Error al generar el archivo: {str(e)}", 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)

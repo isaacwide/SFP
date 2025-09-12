@@ -313,3 +313,50 @@
                 transform: translateX(0);
             }
         }
+        /* Checkbox estilizado */
+        .input-group input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #3498db;
+            border-radius: 6px; /* más redondeado */
+            background: white;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Hover */
+        .input-group input[type="checkbox"]:hover {
+            border-color: #2980b9;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+        }
+
+        /* Checked */
+        .input-group input[type="checkbox"]:checked {
+            background: #3498db;
+            border-color: #3498db;
+        }
+
+        /* ✔ con mejor alineación */
+        .input-group input[type="checkbox"]:checked::after {
+            content: "✔";
+            font-size: 14px;
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -55%); /* centra el check */
+            font-weight: bold;
+        }
+
+        /* Label con espacio a la derecha */
+        .input-group label {
+            font-weight: 500;
+            color: #2c3e50;
+            cursor: pointer;
+        }
+
+        

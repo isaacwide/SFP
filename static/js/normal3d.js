@@ -30,19 +30,23 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             // Generar normales estándar
-            let z1 = normal(n, 0, 1);
-            let z2 = normal(n, 0, 1);
+            let z1 = normal(n, mu1, sigma1);
+            let z2 = normal(n, mu2, sigma2);
 
             // Generar normales correlacionadas
             let x_vals = [];
             let y_vals = [];
             let z_vals = [];
             for (let i = 0; i < n; i++) {
-                let x = mu1 + sigma1 * z1[i];
-                let y = mu2 + sigma2 * (rho * z1[i] + Math.sqrt(1 - rho * rho) * z2[i]);
+                // Para X|Y (dado un valor inicial de Y)
+                let x = mu1 + rho * (sigma1/sigma2) * (z2[i] - mu2) + sigma1 * Math.sqrt(1 - rho*rho) * z1[i];
+                
+                // Para Y|X (usando el X recién generado)
+                let y = mu2 + rho * (sigma2/sigma1) * (x - mu1) + sigma2 * Math.sqrt(1 - rho*rho) * z2[i];
+                
                 x_vals.push(x);
                 y_vals.push(y);
-                z_vals.push(i); // Iteración como eje z
+                z_vals.push(0.5); // Iteración
             }
 
             // Crear traza 3D
@@ -60,6 +64,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             };
 
+            let hist2d = {
+                            x: x_vals,
+                            y: y_vals,
+                            type: "histogram2d",
+                            colorscale: "Viridis"
+                        };
+
             // Configuración del layout
             let layout = {
                 margin: { l: 0, r: 0, b: 0, t: 0 },
@@ -73,8 +84,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             };
 
+            let layoutHist = {
+                title: "Histograma 2D",
+                xaxis: { title: "X" },
+                yaxis: { title: "Y" }
+            };
+
             // Dibujar gráfica
             Plotly.newPlot('grafica3d', [trace], layout);
+            Plotly.newPlot("histo3d", [hist2d], layoutHist);
         });
     }
 });

@@ -41,11 +41,11 @@
                         {% if distribucion == '2normal' %}
                         <div class="input-group">
                             <label for="rho">Correlación ρ:</label>
-                            <input type="number" id="rho" name="rho" min="0" max="1" step="0.01" value="0.5" required>
+                            <input type="number" id="rho" name="rho" min="0" max="1" step="0.01" value="0" required>
                             <small>Valores entre (0,1)</small>
 
                             <label for="miu1">μ₁:</label>
-                            <input type="number" id="miu1" name="miu1" min="-10" max="10" value="1" required>
+                            <input type="number" id="miu1" name="miu1" min="-10" max="10" value="0" required>
                             <small>Media de la primera variable</small>
 
                             <label for="sigma1">σ₁²:</label>
@@ -53,7 +53,7 @@
                             <small>Varianza de la primera variable</small>
 
                             <label for="miu2">μ₂:</label>
-                            <input type="number" id="miu2" name="miu2" min="-10" max="10" value="1" required>
+                            <input type="number" id="miu2" name="miu2" min="-10" max="10" value="0" required>
                             <small>Media de la segunda variable</small>
 
                             <label for="sigma2">σ₂²:</label>

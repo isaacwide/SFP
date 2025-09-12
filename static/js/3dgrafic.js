@@ -1,13 +1,14 @@
         function x_y(y) {
-                    let u_1 = Math.random();
-                    let delta1 = Math.sqrt(Math.max((4 * (y ** 2)) + (12 * y) + 4 + (32 * u_1) + (24 * y * u_1), 0));
-                    return ((-(3 * y) - 2 + delta1) / 2);
+                    let u = Math.random();
+                    const discriminant = 4 * (y*y + 3*y + 1 + u*(6*y + 8));
+                    return (-3*y - 2 + Math.sqrt(Math.max(0, discriminant))) / 2;
                 }
 
         function y_x(x) {
-            let u= Math.random();
-            let delta2 = Math.sqrt(Math.max((x ** 2) + (2 * x) + 1 + (6 * u * x) + (15 * u), 0));
-            return ((-(2 * x) - 2 + (2 * delta2)) / 3);
+            let u = Math.random();
+            const base = x + 1;
+            const discriminant = base*base + 3*u*(2*x + 5);
+            return 2*(-base + Math.sqrt(Math.max(0, discriminant))) / 3;
         }
 
         function gebbs(n, x, y) {
@@ -44,7 +45,7 @@
                     // Preparar datos para la gráfica
                     let x_vals = samples.map(p => p[0]);
                     let y_vals = samples.map(p => p[1]);
-                    let z_vals = samples.map((p, i) => 1);
+                    let z_vals = samples.map((p, i) => 0.5); // Iteración como eje z
 
                     // Crear traza 3D
                     let trace = {
@@ -67,8 +68,6 @@
                             type: "histogram2d",
                             colorscale: "Viridis"
                         };
-
-                        Plotly.newPlot("grafica3d", [hist2d]);
 
                     // Configuración del layout
                     let layout = {
