@@ -1,4 +1,5 @@
 // a qui va ir las funciones para simumar una normal en 2 variables
+// Función para generar números normales
 function normal(n, mu, sigma) {
     let x = [];
     for (let i = 0; i < n; i++) {
@@ -8,6 +9,44 @@ function normal(n, mu, sigma) {
         x.push(z0 * sigma + mu);
     }
     return x;
+}
+
+// Función para calcular histograma 2D
+function calculate2DHistogram(x, y, bins) {
+    // Encontrar rangos
+    const xMin = Math.min(...x);
+    const xMax = Math.max(...x);
+    const yMin = Math.min(...y);
+    const yMax = Math.max(...y);
+    
+    // Calcular tamaño de bins
+    const xBinSize = (xMax - xMin) / bins;
+    const yBinSize = (yMax - yMin) / bins;
+    
+    // Inicializar matriz de conteo
+    const counts = Array(bins).fill().map(() => Array(bins).fill(0));
+    
+    // Contar puntos en cada bin
+    for (let i = 0; i < x.length; i++) {
+        const xBin = Math.min(bins - 1, Math.floor((x[i] - xMin) / xBinSize));
+        const yBin = Math.min(bins - 1, Math.floor((y[i] - yMin) / yBinSize));
+        counts[xBin][yBin]++;
+    }
+    
+    // Preparar datos para surface plot
+    const xCenters = [];
+    const yCenters = [];
+    
+    for (let i = 0; i < bins; i++) {
+        xCenters.push(xMin + (i + 0.5) * xBinSize);
+        yCenters.push(yMin + (i + 0.5) * yBinSize);
+    }
+    
+    return {
+        x: xCenters,
+        y: yCenters,
+        z: counts
+    };
 }
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -30,8 +69,8 @@ document.addEventListener("DOMContentLoaded", function() {
             }
 
             // Generar normales estándar
-            let z1 = normal(n, mu1, sigma1);
-            let z2 = normal(n, mu2, sigma2);
+            let z1 = normal(n, 0, 1);
+            let z2 = normal(n, 0, 1);
 
             // Generar normales correlacionadas
             let x_vals = [];
@@ -39,7 +78,7 @@ document.addEventListener("DOMContentLoaded", function() {
             let z_vals = [];
             for (let i = 0; i < n; i++) {
                 // Para X|Y (dado un valor inicial de Y)
-                let x = mu1 + rho * (sigma1/sigma2) * (z2[i] - mu2) + sigma1 * Math.sqrt(1 - rho*rho) * z1[i];
+                let x = mu1 + sigma1 * z1[i];
                 
                 // Para Y|X (usando el X recién generado)
                 let y = mu2 + rho * (sigma2/sigma1) * (x - mu1) + sigma2 * Math.sqrt(1 - rho*rho) * z2[i];
@@ -49,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 z_vals.push(0.5); // Iteración
             }
 
-            // Crear traza 3D
+            // Crear traza 3D de dispersión
             let trace = {
                 x: x_vals,
                 y: y_vals,
@@ -61,15 +100,32 @@ document.addEventListener("DOMContentLoaded", function() {
                     color: z_vals,
                     colorscale: 'Viridis',
                     opacity: 0.8
-                }
+                },
+                name: 'Muestras Normales'
             };
 
+            // Crear histograma 2D
             let hist2d = {
-                            x: x_vals,
-                            y: y_vals,
-                            type: "histogram2d",
-                            colorscale: "Viridis"
-                        };
+                x: x_vals,
+                y: y_vals,
+                type: "histogram2d",
+                colorscale: "Viridis",
+                name: 'Histograma 2D'
+            };
+
+            // Calcular histograma 3D
+            const histogramData = calculate2DHistogram(x_vals, y_vals, 20);
+            
+            // Crear traza 3D para el histograma
+            let histogram3DTrace = {
+                x: histogramData.x,
+                y: histogramData.y,
+                z: histogramData.z,
+                type: 'surface',
+                colorscale: 'Viridis',
+                opacity: 0.8,
+                name: 'Histograma 3D'
+            };
 
             // Configuración del layout
             let layout = {
@@ -90,7 +146,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 yaxis: { title: "Y" }
             };
 
-            // Dibujar gráfica
+            // Almacenar trazas y layout para alternar entre ellas
+            window.currentTraces = {
+                scatter: trace,
+                histogram3d: histogram3DTrace,
+                histogram2d: hist2d
+            };
+            window.currentLayout = layout;
+
+            // Dibujar gráfica inicial (scatter3d)
             Plotly.newPlot('grafica3d', [trace], layout);
             Plotly.newPlot("histo3d", [hist2d], layoutHist);
         });

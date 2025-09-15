@@ -7,7 +7,6 @@
     <title>{{ titulo }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/c2.css') }}">
     <style>
-        /* Solo estilos mínimos para el botón */
         .toggle-button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -29,7 +28,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        /* Ocultar gráfica inactiva */
         .chart-hidden {
             display: none !important;
         }
@@ -45,7 +43,6 @@
             <div class="left-panel">
                 <div class="info-card">
                     <h3>⚙️ Parámetros de Simulación</h3>
-                    <!-- FORMULARIO CORREGIDO -->
                     <form id="formulario" class="param-form" onsubmit="return false;">
                         {% if distribucion == 'gebbs' %}
                         <div class="input-group">
@@ -105,10 +102,9 @@
             </div>
 
             <div class="right-panel">
-                <!-- NUEVO: Botón simple para alternar -->
                 <button class="toggle-button" onclick="toggleChart()">
                     <span id="button-icon">🎨</span>
-                    <span id="button-text">Ver Histograma 2D</span>
+                    <span id="button-text">Ver Histograma 3D</span>
                 </button>
 
                 <div class="grafico-container">
@@ -120,7 +116,7 @@
     </div>
 
     <script>
-        let showing3D = true;
+        let currentView = 'scatter3d'; // Puede ser 'scatter3d', 'histogram3d', o 'histogram2d'
 
         function toggleChart() {
             const grafica3d = document.getElementById('grafica3d');
@@ -128,34 +124,38 @@
             const buttonIcon = document.getElementById('button-icon');
             const buttonText = document.getElementById('button-text');
 
-            if (showing3D) {
-                // Mostrar histograma 2D
-                grafica3d.classList.add('chart-hidden');
-                histo3d.classList.remove('chart-hidden');
+            // Ocultar todas las gráficas primero
+            grafica3d.classList.add('chart-hidden');
+            histo3d.classList.add('chart-hidden');
+            
+            // Determinar qué vista mostrar next
+            if (currentView === 'scatter3d') {
+                currentView = 'histogram3d';
+                grafica3d.classList.remove('chart-hidden');
                 buttonIcon.textContent = '📊';
+                buttonText.textContent = 'Ver Histograma 2D';
+                // Mostrar histograma 3D en el contenedor de grafica3d
+                Plotly.newPlot('grafica3d', [window.currentTraces.histogram3d], window.currentLayout);
+            } else if (currentView === 'histogram3d') {
+                currentView = 'histogram2d';
+                histo3d.classList.remove('chart-hidden');
+                buttonIcon.textContent = '🔍';
                 buttonText.textContent = 'Ver Gráfica 3D';
-                showing3D = false;
-                
-                // Redimensionar Plotly si existe
-                if (window.Plotly && histo3d.firstElementChild) {
-                    setTimeout(() => {
-                        Plotly.Plots.resize(histo3d.firstElementChild);
-                    }, 100);
-                }
             } else {
-                // Mostrar gráfica 3D
-                histo3d.classList.add('chart-hidden');
+                currentView = 'scatter3d';
                 grafica3d.classList.remove('chart-hidden');
                 buttonIcon.textContent = '🎨';
-                buttonText.textContent = 'Ver Histograma 2D';
-                showing3D = true;
-                
-                // Redimensionar Plotly si existe
-                if (window.Plotly && grafica3d.firstElementChild) {
-                    setTimeout(() => {
-                        Plotly.Plots.resize(grafica3d.firstElementChild);
-                    }, 100);
-                }
+                buttonText.textContent = 'Ver Histograma 3D';
+                // Mostrar scatter 3D
+                Plotly.newPlot('grafica3d', [window.currentTraces.scatter], window.currentLayout);
+            }
+            
+            // Redimensionar Plotly si es necesario
+            const activeChart = currentView === 'histogram2d' ? histo3d : grafica3d;
+            if (window.Plotly && activeChart.firstElementChild) {
+                setTimeout(() => {
+                    Plotly.Plots.resize(activeChart.firstElementChild);
+                }, 100);
             }
         }
     </script>
