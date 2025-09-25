@@ -16,22 +16,22 @@
 
         <!-- Content Wrapper con Layout Dividido -->
         <div class="content-wrapper">
-            <!-- Panel Izquierdo - Información y Controles -->
+            <!-- Panel Izquierdo - Informacion y Controles -->
             <div class="left-panel">
                 
-                <!-- Formulario de Parámetros -->
+                <!-- Formulario de Parametros -->
                 <div class="info-card">
-                    <h3>⚙️ Parámetros de Simulación</h3>
+                    <h3>⚙️ Parametros de Simulacion</h3>
                     <form method="POST" class="param-form">
                         
                         {% if distribucion == 'bernoulli' %}
                         <div class="input-group">
                             <label for="theta">Probabilidad (θ):</label>
                             <input type="number" id="theta" name="theta" min="0" max="1" step="0.01" value="{{ theta }}" required>
-                            <small>Probabilidad de éxito (0-1)</small>
+                            <small>Probabilidad de exito (0-1)</small>
                         </div>
                         <div class="input-group">
-                            <label for="n">Número de simulaciones:</label>
+                            <label for="n">Numero de simulaciones:</label>
                             <input type="number" id="n" name="n" min="100" max="100000" value="{{ n }}" required>
                             <small>Cantidad de experimentos</small>
                         </div>
@@ -41,10 +41,10 @@
                         <div class="input-group">
                             <label for="lambda">Lambda (λ):</label>
                             <input type="number" id="lambda" name="lambda" min="0.1" max="10" step="0.1" value="{{ lmbda }}" required>
-                            <small>Parámetro de tasa</small>
+                            <small>Parametro de tasa</small>
                         </div>
                         <div class="input-group">
-                            <label for="n">Número de muestras:</label>
+                            <label for="n">Numero de muestras:</label>
                             <input type="number" id="n" name="n" min="50" max="10000" value="{{ n }}" required>
                             <small>Cantidad de valores a generar</small>
                         </div>
@@ -52,7 +52,7 @@
 
                         {% if distribucion == 'multinomial' %}
                         <div class="input-group">
-                            <label for="n">Número de simulaciones:</label>
+                            <label for="n">Numero de simulaciones:</label>
                             <input type="number" id="n" name="n" min="100" max="100000" value="{{ n }}" required>
                             <small>Cantidad de experimentos</small>
                         </div>
@@ -73,17 +73,17 @@
                         <div class="input-group">
                             <label for="theta">Probabilidad (θ):</label>
                             <input type="number" id="theta" name="theta" min="0" max="1" step="0.01" value="{{ theta }}" required>
-                            <small>Probabilidad de éxito</small>
+                            <small>Probabilidad de exito</small>
                         </div>
                         <div class="input-group">
                             <label for="lanzamientos">Lanzamientos por experimento:</label>
                             <input type="number" id="lanzamientos" name="lanzamientos" min="1" max="100" value="{{ lanzamientos }}" required>
-                            <small>Número de intentos por simulación</small>
+                            <small>Numero de intentos por simulacion</small>
                         </div>
                         <div class="input-group">
                             <label for="repeticiones">N repeticiones:</label>
                             <input type="number" id="repeticiones" name="repeticiones" min="100" max="10000" value="{{ repeticiones }}" required>
-                            <small>Número de experimentos</small>
+                            <small>Numero de experimentos</small>
                         </div>
                         {% endif %}
 
@@ -91,7 +91,7 @@
                         <div class="input-group">
                             <label for="repeticiones">Repeticiones del Experimento:</label>
                             <input type="number" id="repeticiones" name="repeticiones" min="100" max="1000000" value="{{ repeticiones }}" required>
-                            <small>Número de experimentos</small>
+                            <small>Numero de experimentos</small>
 
                             <label for="repeticiones">Parametro μ:</label>
                             <input type="number" id="miu" name="miu" min="0" max="1000000" step="0.01" value="{{ varianza }}" required>
@@ -105,7 +105,7 @@
 
                         {% if distribucion == 'gebbs' %}
                         <div class="input-group">
-                            <label for="repeticiones">simulación de gebbs:</label>
+                            <label for="repeticiones">simulacion de gebbs:</label>
                             
                             <label for="repeticiones">x0:</label>
                             <input type="number" id="x" name="x" min="0" max="10" value="{{ repeticiones }}" required>
@@ -124,13 +124,13 @@
 
                         {% endif %}
 
-                        <button id="formulario" type="submit" class="update-button">🔄 Actualizar Simulación</button>
+                        <button id="formulario" type="submit" class="update-button">🔄 Actualizar Simulacion</button>
                     </form>
                 </div>
                 
                 {% if soles is defined and aguilas is defined %}
                 <div class="info-card">
-                    <h3>📊 Resultados de Simulación</h3>
+                    <h3>📊 Resultados de Simulacion</h3>
                     <div class="stats-grid">
                         <div class="stat-item">
                             <div class="stat-value">{{ soles }}</div>
@@ -138,12 +138,12 @@
                         </div>
                         <div class="stat-item">
                             <div class="stat-value">{{ aguilas }}</div>
-                            <div class="stat-label">Águilas</div>
+                            <div class="stat-label">aguilas</div>
                         </div>
                     </div>
                     <div class="percentage-info">
                         <p><strong>Porcentaje de soles:</strong> {{ "%.1f"|format((soles/(soles+aguilas))*100) }}%</p>
-                        <p><strong>Porcentaje de águilas:</strong> {{ "%.1f"|format((aguilas/(soles+aguilas))*100) }}%</p>
+                        <p><strong>Porcentaje de aguilas:</strong> {{ "%.1f"|format((aguilas/(soles+aguilas))*100) }}%</p>
                     </div>
                 </div>
                 {% endif %}
@@ -152,7 +152,7 @@
                     <h3>💾 Descargar Datos</h3>
                     <form action="/descargar_datos/{{ distribucion }}" method="POST">
                         <input type="hidden" name="datos" value="{{ datos_descarga }}">
-                        <button type="submit" class="download-button">⬇️ Descargar TXT</button>
+                        <button type="submit" class="download-button">⬇️ Descargar CSV</button>
                     </form>
                 </div>
                 {% endif %}
@@ -171,11 +171,11 @@
                 
                 {% if promedio is defined %}
                 <div class="info-card">
-                    <h3>📈 Estadísticas Generales</h3>
+                    <h3>📈 Estadisticas Generales</h3>
                     <div class="stats-grid">
                         <div class="stat-item">
                             <div class="stat-value">{{ "%.2f"|format(promedio) }}</div>
-                            <div class="stat-label">Promedio de Éxitos</div>
+                            <div class="stat-label">Promedio de exitos</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-value">{{ total_simulaciones }}</div>
@@ -187,7 +187,7 @@
 
                 {% if miu is defined and sigma is defined %}
                 <div class="info-card">
-                    <h3>📈 Estadísticas Generales</h3>
+                    <h3>📈 Estadisticas Generales</h3>
                     <div class="stats-grid">
                         <div class="stat-item">
                             <div class="stat-value">{{miu}}</div>
@@ -202,19 +202,19 @@
                 {% endif %}
 
 
-                <!-- Botón para volver -->
+                <!-- Boton para volver -->
                 <div style="text-align: center;">
                     <a href="/" class="back-button">← Volver al inicio</a>
                 </div>
             </div>
 
-            <!-- Panel Derecho - Gráfica -->
+            <!-- Panel Derecho - Grafica -->
             <div class="right-panel">
                 <div class="grafico-container">
                     {% if distribucion == 'gebbs' %}
                          <div id="grafica3d" style="width:600px; height:600px;"></div>
                     {% else %}
-                          <img src="data:image/png;base64,{{ imagen }}" alt="Gráfico de {{ titulo }}">
+                          <img src="data:image/png;base64,{{ imagen }}" alt="Grafico de {{ titulo }}">
                     {% endif %}
                 </div>
             </div>

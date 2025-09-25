@@ -1,6 +1,6 @@
-# Simulador de distribuciones estadísticas
+# Simulador de distribuciones estadisticas
 
-Esta es una app web que simula las distintas distribuciones estadísticas, como lo son: **Bernoulli, Exponencial, Multinomial y Binomial**.
+Esta es una app web que simula las distintas distribuciones estadisticas, como lo son: **Bernoulli, Exponencial, Multinomial y Binomial**.
 
 ---
 

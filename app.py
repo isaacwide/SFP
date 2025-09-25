@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from fuctions import bernuli, exponencial, multinomial, norm, simulacion_binomial
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024 
 
 @app.route('/')
 def index():
@@ -31,13 +31,13 @@ def bernoulli():
     soles, aguilas, secuencia = bernuli.simBernoulli(theta=theta, n=n)
     par = [soles, aguilas]
 
-    # Crear el gráfico
+    # Crear el grafico
     plt.figure()
     fig, ax = plt.subplots()
     ax.bar(x=range(len(par)), height=par)
     ax.set_xticks([0, 1])
-    ax.set_xticklabels(['Soles', 'Águilas'])
-    plt.title(f'Distribución de Bernoulli (θ={theta}, n={n})')      
+    ax.set_xticklabels(['Soles', 'aguilas'])
+    plt.title(f'Distribucion de Bernoulli (θ={theta}, n={n})')      
     img = BytesIO()
     plt.savefig(img, format='png')
     img.seek(0)
@@ -46,10 +46,10 @@ def bernoulli():
     img_str = base64.b64encode(img.getvalue()).decode('ascii')
     
     # Crear datos para descarga
-    datos_descarga = "\n".join([f"Experimento {i+1}: {'Sol' if x == 1 else 'Águila'}" for i, x in enumerate(secuencia)])
+    datos_descarga = "\n".join([f"Experimento {i+1}: {'Sol' if x == 1 else 'aguila'}" for i, x in enumerate(secuencia)])
     
     return render_template('resultado.html', 
-                         titulo='Distribución de Bernoulli',
+                         titulo='Distribucion de Bernoulli',
                          soles=soles, 
                          aguilas=aguilas,
                          imagen=img_str,
@@ -75,7 +75,7 @@ def exponential():
     plt.figure()
     fig, ax = plt.subplots()
     ax.hist(valores, bins=20, edgecolor='black', density=True)  
-    plt.title(f'Distribución Exponencial (λ={lmbda}, n={n})')
+    plt.title(f'Distribucion Exponencial (λ={lmbda}, n={n})')
     plt.xlabel('Valores')
     plt.ylabel('Frecuencia relativa')
     img = BytesIO()
@@ -88,7 +88,7 @@ def exponential():
     datos_descarga = "\n".join([f"Muestra {i+1}: {x}" for i, x in enumerate(valores)])
 
     return render_template('resultado.html',
-                         titulo='Distribución Exponencial',
+                         titulo='Distribucion Exponencial',
                          imagen=img_str,
                          distribucion='exponencial',
                          lmbda=lmbda,
@@ -101,13 +101,14 @@ def multi():
     n = 10000
     caras = 5
     uniforme = False
+    
     # valores del usuario
     if request.method == 'POST':
         n = int(request.form.get('n', 10000))
         caras = int(request.form.get('caras', 5))
         uniforme = request.form.get('uniforme') == '1'
 
-    histograma, secuencia , probabilidades= multinomial.simMultinomial(n=n, rangos=caras, uniforme=uniforme)
+    histograma, secuencia, probabilidades = multinomial.simMultinomial(n=n, rangos=caras, uniforme=uniforme)
     
     # Generar la imagen del histograma
     plt.figure()
@@ -117,7 +118,7 @@ def multi():
     ax.set_ylabel('Frecuencia')
     ax.set_xticks(range(len(histograma)))
     ax.set_xticklabels([f' {i+1}' for i in range(len(histograma))])
-    plt.title(f'Distribución Multinomial ({caras} caras, n={n})')
+    plt.title(f'Distribucion Multinomial ({caras} caras, n={n})')
     img = BytesIO()
     plt.savefig(img, format='png')
     img.seek(0)
@@ -125,14 +126,25 @@ def multi():
 
     img_str = base64.b64encode(img.getvalue()).decode('ascii')
 
-    # Crear datos para descarga
-    # Guardar también las probabilidades
-    datos_probabilidades = "Probabilidades:\n" + ", ".join([f"Cara {i+1}: {p:.4f}" for i, p in enumerate(probabilidades)])
-    datos_lanzamientos = "\n".join([f"Lanzamiento {i+1}: Cara {resultado+1}" for i, resultado in enumerate(secuencia)])
+    datos_probabilidades = "Probabilidades:\n"
+    for i, p in enumerate(probabilidades):
+        datos_probabilidades += f"Cara {i+1}: {p:.4f}"
+        if i < len(probabilidades) - 1:
+            datos_probabilidades += ", "
+    
+
+    max_lanzamientos = 10000
+    if len(secuencia) > max_lanzamientos:
+        secuencia_reducida = secuencia[:max_lanzamientos]
+        datos_lanzamientos = "\n".join([f"Lanzamiento {i+1}: Cara {resultado+1}" for i, resultado in enumerate(secuencia_reducida)])
+        datos_lanzamientos += f"\n\n... y {len(secuencia) - max_lanzamientos} lanzamientos mas (total: {len(secuencia)})"
+    else:
+        datos_lanzamientos = "\n".join([f"Lanzamiento {i+1}: Cara {resultado+1}" for i, resultado in enumerate(secuencia)])
+    
     datos_descarga = datos_probabilidades + "\n\n" + datos_lanzamientos
 
     return render_template('resultado.html',
-                         titulo='Distribución Multinomial',
+                         titulo='Distribucion Multinomial',
                          datos=histograma,
                          imagen=img_str,
                          distribucion='multinomial',
@@ -156,13 +168,13 @@ def binomial():
     
     histograma, promedio, secuencia = simulacion_binomial.simBinomial(theta=theta, lanzamientos=lanzamientos, repeticiones=repeticiones)
     
-    # Crear el gráfico
+    # Crear el grafico
     plt.figure()
     fig, ax = plt.subplots()
     ax.hist(histograma, bins=20, edgecolor="black", density=True)
-    ax.set_xlabel("Número de soles (éxitos)")
+    ax.set_xlabel("Numero de soles (exitos)")
     ax.set_ylabel("Frecuencia relativa")
-    plt.title(f'Distribución Binomial (θ={theta}, n={lanzamientos}, rep={repeticiones})')
+    plt.title(f'Distribucion Binomial (θ={theta}, n={lanzamientos}, rep={repeticiones})')
     img = BytesIO()
     plt.savefig(img, format='png')
     img.seek(0)
@@ -170,11 +182,15 @@ def binomial():
 
     img_str = base64.b64encode(img.getvalue()).decode('ascii')
 
-    # Crear datos para descarga
-    datos_descarga = "\n".join([f"Experimento {i+1}: {exitos} éxitos" for i, exitos in enumerate(secuencia)])
+    if len(secuencia) > 10000:
+        secuencia_reducida = secuencia[:10000]
+        datos_descarga = "\n".join([f"Experimento {i+1}: {exitos} exitos" for i, exitos in enumerate(secuencia_reducida)])
+        datos_descarga += f"\n\n... y {len(secuencia) - 10000} experimentos mas (total: {len(secuencia)})"
+    else:
+        datos_descarga = "\n".join([f"Experimento {i+1}: {exitos} exitos" for i, exitos in enumerate(secuencia)])
 
     return render_template('resultado.html',
-                         titulo='Distribución Binomial',
+                         titulo='Distribucion Binomial',
                          promedio=round(promedio, 2),
                          total_simulaciones=len(histograma),
                          imagen=img_str,
@@ -215,7 +231,7 @@ def normal():
     datos_descarga = "\n".join([f"Muestra {i+1}: {x}" for i, x in enumerate(valores)])
 
     return render_template('resultado.html',
-                         titulo='Distribución Normal',
+                         titulo='Distribucion Normal',
                          imagen=img_str,
                          distribucion='normal',
                          miu=miu,
@@ -229,7 +245,7 @@ def normal():
 @app.route('/gebbs', methods=['GET', 'POST'])
 def gebbs_method():
     return render_template('grafic3d.html',
-                         titulo='Método de Gebbs',
+                         titulo='Metodo de Gebbs',
                          distribucion='gebbs')
 
 
@@ -246,18 +262,115 @@ def descargar_datos(distribucion):
     try:
         datos = request.form.get('datos', '')
         
-        if not datos and 'datos' in request.form:
-
-            pass
+        # Si no hay datos, retornar error
+        if not datos:
+            return "No hay datos para descargar", 400
             
-        filename = f"simulacion_{distribucion}.txt"
+        csv_datos = ""
+        filename = f"simulacion_{distribucion}.csv"
         
-        # Crear archivo temporal
-        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.txt', encoding='utf-8') as tmp_file:
-            tmp_file.write(datos)
+        if distribucion == 'bernoulli':
+            lineas = datos.split('\n')
+            csv_datos = "Experimento,Resultado\n"
+            for linea in lineas:
+                if ': ' in linea:
+                    try:
+                        partes = linea.split(': ')
+                        csv_datos += f"{partes[0].replace('Experimento ', '')},{partes[1]}\n"
+                    except IndexError:
+                        continue  # Saltar lineas mal formateadas
+        
+        elif distribucion == 'exponencial':
+            lineas = datos.split('\n')
+            csv_datos = "Muestra,Valor\n"
+            for linea in lineas:
+                if ': ' in linea:
+                    try:
+                        partes = linea.split(': ')
+                        csv_datos += f"{partes[0].replace('Muestra ', '')},{partes[1]}\n"
+                    except IndexError:
+                        continue
+        
+        elif distribucion == 'multinomial':
+            # Hacer el procesamiento mas robusto
+            partes = datos.split('\n\n')
+            
+            # Verificar que tenemos al menos una parte
+            if len(partes) == 0:
+                return "Formato de datos invalido", 400
+                
+            csv_datos = ""
+            
+            # Procesar probabilidades si existen
+            if len(partes) > 0 and 'Probabilidades:' in partes[0]:
+                prob_lineas = partes[0].split('\n')
+                if len(prob_lineas) > 1:  # Si hay mas de una linea (encabezado + datos)
+                    csv_datos += "Cara,Probabilidad\n"
+                    # Procesar todas las lineas despues del encabezado
+                    for linea in prob_lineas[1:]:
+                        if linea.strip():  # Si la linea no esta vacia
+                            # Dividir por comas para obtener cada par cara-probabilidad
+                            elementos = linea.split(', ')
+                            for elemento in elementos:
+                                if ': ' in elemento:
+                                    try:
+                                        cara_prob = elemento.split(': ')
+                                        cara = cara_prob[0].replace('Cara ', '')
+                                        prob = cara_prob[1]
+                                        csv_datos += f"{cara},{prob}\n"
+                                    except IndexError:
+                                        continue
+            
+            # Procesar lanzamientos si existen
+            if len(partes) > 1:
+                lanzamientos = partes[1].split('\n')
+                csv_datos += "\nLanzamiento,Resultado\n"
+                for linea in lanzamientos:
+                    if ': ' in linea:
+                        try:
+                            partes_linea = linea.split(': ')
+                            lanzamiento_num = partes_linea[0].replace('Lanzamiento ', '')
+                            resultado = partes_linea[1].replace('Cara ', '')
+                            csv_datos += f"{lanzamiento_num},{resultado}\n"
+                        except IndexError:
+                            continue
+        
+        elif distribucion == 'binomial':
+            lineas = datos.split('\n')
+            csv_datos = "Experimento,exitos\n"
+            for linea in lineas:
+                if ': ' in linea:
+                    try:
+                        partes = linea.split(': ')
+                        num_experimento = partes[0].replace('Experimento ', '')
+                        num_exitos = partes[1].replace(' exitos', '')
+                        csv_datos += f"{num_experimento},{num_exitos}\n"
+                    except IndexError:
+                        continue
+        
+        elif distribucion == 'normal':
+            lineas = datos.split('\n')
+            csv_datos = "Muestra,Valor\n"
+            for linea in lineas:
+                if ': ' in linea:
+                    try:
+                        partes = linea.split(': ')
+                        csv_datos += f"{partes[0].replace('Muestra ', '')},{partes[1]}\n"
+                    except IndexError:
+                        continue
+        
+        else:
+            # Para distribuciones no especificadas, usar formato simple
+            csv_datos = "Datos\n" + datos.replace('\n', '\n')
+        
+        # Si no se generaron datos CSV, crear un formato basico
+        if not csv_datos.strip():
+            csv_datos = "Datos\n" + datos.replace('\n', '\n')
+        
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.csv', encoding='utf-8') as tmp_file:
+            tmp_file.write(csv_datos)
             temp_filename = tmp_file.name
         
-        # Función de limpieza
         def cleanup():
             try:
                 if temp_filename and os.path.exists(temp_filename):
@@ -269,7 +382,7 @@ def descargar_datos(distribucion):
             temp_filename,
             as_attachment=True,
             download_name=filename,
-            mimetype='text/plain'
+            mimetype='text/csv'
         )
         
         response.call_on_close(cleanup)
@@ -283,6 +396,6 @@ def descargar_datos(distribucion):
             except:
                 pass
         return f"Error al generar el archivo: {str(e)}", 500
-
+    
 if __name__ == '__main__':
     app.run(debug=True, port=8080)

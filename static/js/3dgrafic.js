@@ -24,7 +24,7 @@ function gebbs(n, x, y) {
     return samples;
 }
 
-// Función para calcular histograma 2D
+// Funcion para calcular histograma 2D
 function calculate2DHistogram(x, y, bins) {
     // Encontrar rangos
     const xMin = Math.min(...x);
@@ -74,19 +74,19 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // Validar inputs
             if (isNaN(x) || isNaN(y) || isNaN(n)) {
-                alert("Por favor ingresa valores numéricos válidos");
+                alert("Por favor ingresa valores numericos validos");
                 return;
             }
 
             // Calcular muestras
             let samples = gebbs(n, x, y);
 
-            // Preparar datos para la gráfica
+            // Preparar datos para la grafica
             let x_vals = samples.map(p => p[0]);
             let y_vals = samples.map(p => p[1]);
-            let z_vals = samples.map((p, i) => 0.5); // Iteración como eje z
+            let z_vals = samples.map((p, i) => 0.5); // Iteracion como eje z
 
-            // Crear traza 3D de dispersión
+            // Crear traza 3D de dispersion
             let trace = {
                 x: x_vals,
                 y: y_vals,
@@ -125,13 +125,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 name: 'Histograma 3D'
             };
 
-            // Configuración del layout
+            // Configuracion del layout
             let layout = {
                 margin: { l: 0, r: 0, b: 0, t: 0 },
                 scene: {
                     xaxis: { title: 'X' },
                     yaxis: { title: 'Y' },
-                    zaxis: { title: 'Iteración' },
+                    zaxis: { title: 'Iteracion' },
                     camera: {
                         eye: { x: 1.5, y: 1.5, z: 1.5 }
                     }
@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", function() {
             };
             window.currentLayout = layout;
 
-            // Dibujar gráfica inicial (scatter3d)
+            // Dibujar grafica inicial (scatter3d)
             Plotly.newPlot('grafica3d', [trace], layout);
             Plotly.newPlot("histo3d", [hist2d]);
         });

@@ -1,4 +1,4 @@
- /* Reset básico */
+ /* Reset basico */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -320,7 +320,7 @@
             width: 20px;
             height: 20px;
             border: 2px solid #3498db;
-            border-radius: 6px; /* más redondeado */
+            border-radius: 6px; /* mas redondeado */
             background: white;
             cursor: pointer;
             position: relative;
@@ -340,7 +340,7 @@
             border-color: #3498db;
         }
 
-        /* ✔ con mejor alineación */
+        /* ✔ con mejor alineacion */
         .input-group input[type="checkbox"]:checked::after {
             content: "✔";
             font-size: 14px;
