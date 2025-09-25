@@ -57,7 +57,7 @@
                             <small>Cantidad de experimentos</small>
                         </div>
                         <div class="input-group">
-                            <label for="caras">Cantidad de variables theta:</label>
+                            <label for="caras">Cantidad de intervalos:</label>
                             <input type="number" id="caras" name="caras" min="2" max="1000" value="{{ caras }}" required>
                             <small>Caras del dado (2-1000)</small>
                         </div>
@@ -90,7 +90,7 @@
                         {% if distribucion == 'normal' %}
                         <div class="input-group">
                             <label for="repeticiones">Repeticiones del Experimento:</label>
-                            <input type="number" id="repeticiones" name="repeticiones" min="100" max="1000000" value="{{ repeticiones }}" required>
+                            <input type="number" id="repeticiones" name="repeticiones" min="100" max="10000" value="{{ repeticiones }}" required>
                             <small>Numero de experimentos</small>
 
                             <label for="repeticiones">Parametro μ:</label>

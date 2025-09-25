@@ -245,7 +245,7 @@ def normal():
 @app.route('/gebbs', methods=['GET', 'POST'])
 def gebbs_method():
     return render_template('grafic3d.html',
-                         titulo='Metodo de Gebbs',
+                         titulo='Metodo de Gibbs',
                          distribucion='gebbs')
 
 
@@ -254,6 +254,13 @@ def normal_2():
     return render_template('grafic3d.html',
                          titulo='Normal en 2 variables',
                          distribucion='2normal')
+
+
+@app.route('/gibbs2', methods=['GET', 'POST'])
+def gibbs2_fuction():
+    return render_template('grafic3d.html',
+                            titulo='Metodo de Gibbs en 2 variables',
+                            distribucion='gibbs2')
 
 
 @app.route('/descargar_datos/<distribucion>', methods=['POST'])

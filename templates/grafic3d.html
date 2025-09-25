@@ -145,6 +145,24 @@
                         </div>
                         {% endif %}
 
+                        {% if distribucion == 'gibbs2'%}
+
+                        <div class="input-group">
+                            <label for="x">Valor inicial x0:</label>
+                            <input type="number" id="x" name="x" min="0" max="10" value="1" required>
+                            <small>Valor inicial para x</small>
+
+                            <label for="y">Valor inicial y0:</label>
+                            <input type="number" id="y" name="y" min="0" max="10" value="1" required>
+                            <small>Valor inicial para y</small>
+
+                            <label for="n">Numero de iteraciones:</label>
+                            <input type="number" id="n" name="n" min="100" max="100000" value="1000" required>
+                            <small>Cantidad de muestras a generar</small>
+                        </div>
+
+                        {% endif %}
+
                         <button type="submit" class="update-button">🔄 Actualizar Simulacion</button>
                     </form>
                 </div>
@@ -188,7 +206,6 @@
             </div>
         </div>
     </div>
-
     <script>
         let currentView = 'dual'; // 'dual' o 'histogram2d'
         let currentSamples = [];
@@ -243,26 +260,52 @@
         }
 
         // Funciones para Gebbs
-        function x_y(y) {
-            let u_1 = Math.random();
-            let delta1 = Math.sqrt(Math.max((4 * (y ** 2)) + (12 * y) + 4 + (32 * u_1) + (24 * y * u_1), 0));
-            return ((-(3 * y) - 2 + delta1) / 2);
-        }
+            function x_y(y) {
+                 let u = Math.random();
+                const discriminant = 4 * (y*y + 3*y + 1 + u*(6*y + 8));
+                return (-3*y - 2 + Math.sqrt(Math.max(0, discriminant))) / 2;
+            }
 
-        function y_x(x) {
-            let u_1 = Math.random();
-            let delta2 = Math.sqrt(Math.max((x ** 2) + (2 * x) + 1 + (6 * u_1 * x) + (15 * x), 0));
-            return ((-(2 * x) - 2 + (2 * delta2)) / 3);
-        }
+            function y_x(x) {
+                let u = Math.random();
+                const base = x + 1;
+                const discriminant = base*base + 3*u*(2*x + 5);
+                return 2*(-base + Math.sqrt(Math.max(0, discriminant))) / 3;
+            }
 
-        function gebbs(n, x, y) {
+            function gebbs(n, x, y) {
+                let x0 = x;
+                let y0 = y;
+                let samples = [[x0, y0]];
+
+                for (let i = 0; i < n; i++) {
+                    let x_n = x_y(samples[i][1]); // x_n depende de y_{i}
+                    let y_n = y_x(x_n);           // y_n depende de x_{n}
+                    samples.push([x_n, y_n]);
+                }
+                return samples;
+            }
+
+        // functions for Gibbs 2 
+
+        function x_given_y(y) {
+            let u = Math.random();
+            return u*(1-y)
+            
+        }
+        function y_given_x(x) {
+            let u = Math.random();
+            return u*(1-x)
+        }
+        
+        function gibbs2(n, x, y) {
             let x0 = x;
             let y0 = y;
             let samples = [[x0, y0]];
 
             for (let i = 0; i < n; i++) {
-                let x_n = x_y(samples[i][1]);
-                let y_n = y_x(samples[i][0]);
+                let x_n = x_given_y(samples[i][1]); // x_n depende de y_{i}
+                let y_n = y_given_x(x_n);           // y_n depende de x_{n}
                 samples.push([x_n, y_n]);
             }
             return samples;
@@ -350,6 +393,27 @@
                 };
                 
                 Plotly.newPlot("histo2d", [hist2d], layout);
+            } else if (currentDistribution === 'gibbs2') {
+                // Para Gibbs en 2 variables, crear histograma 2D de las posiciones
+                const x_vals = currentSamples.map(p => p[0]);
+                const y_vals = currentSamples.map(p => p[1]);
+                
+                let hist2d = {
+                    x: x_vals,
+                    y: y_vals,
+                    type: "histogram2d",
+                    colorscale: "Viridis",
+                    name: 'Histograma 2D'
+                };
+                
+                const layout = {
+                    margin: { l: 40, r: 20, b: 40, t: 20 },
+                    xaxis: { title: 'X' },
+                    yaxis: { title: 'Y' }
+                };
+                
+                Plotly.newPlot("histo2d", [hist2d], layout);
+
             }
         }
 
@@ -360,12 +424,12 @@
                 let trace3d = {
                     x: currentSamples.map(p => p[0]),
                     y: currentSamples.map(p => p[1]),
-                    z: currentSamples.map((p, i) => i),
+                    z: currentSamples.map(() => 1), // Altura fija de 1
                     mode: 'markers',
                     type: 'scatter3d',
                     marker: { 
                         size: 3, 
-                        color: currentSamples.map((p, i) => i), 
+                        color: currentSamples.map(() => 1), // Color acorde a altura fija
                         colorscale: 'Viridis',
                         opacity: 0.8
                     },
@@ -449,6 +513,53 @@
                 };
                 
                 Plotly.newPlot('histograma3d', [histogram3DTrace], layout3d);
+            }else if (currentDistribution === 'gibbs2'){
+                let trace3d = {
+                    x: currentSamples.map(p => p[0]),
+                    y: currentSamples.map(p => p[1]),
+                    z: currentSamples.map(() => 1), // Altura fija de 1
+                    mode: 'markers',
+                    type: 'scatter3d',
+                    marker: { 
+                        size: 3, 
+                        color: currentSamples.map(() => 1), // Color acorde a altura fija
+                        colorscale: 'Viridis',
+                        opacity: 0.8
+                    },
+                    name: 'Muestras Gibbs'
+                };
+
+                const layout3d = {
+                    margin: { l: 10, r: 10, b: 10, t: 10 },
+                    scene: {
+                        xaxis: { title: 'X' },
+                        yaxis: { title: 'Y' },
+                        zaxis: { title: 'Iteración' },
+                        camera: { eye: { x: 1.5, y: 1.5, z: 1.5 } }
+                    }
+                };
+
+                Plotly.newPlot('grafica3d', [trace3d], layout3d);
+
+                // Histograma 3D
+                const histogramData = calculate2DHistogram(
+                    currentSamples.map(p => p[0]), 
+                    currentSamples.map(p => p[1]), 
+                    20
+                );
+                
+                let histogram3DTrace = {
+                    x: histogramData.x,
+                    y: histogramData.y,
+                    z: histogramData.z,
+                    type: 'surface',
+                    colorscale: 'Viridis',
+                    opacity: 0.8,
+                    name: 'Histograma 3D'
+                };
+                
+                Plotly.newPlot('histograma3d', [histogram3DTrace], layout3d);
+
             }
         }
 
@@ -503,6 +614,18 @@
                         }
 
                         currentSamples = x_vals.map((x, i) => [x, y_vals[i]]);
+                        createDualCharts();
+                    }else if (currentDistribution === 'gibbs2'){
+                        const x = Number(document.getElementById('x').value);
+                        const y = Number(document.getElementById('y').value);
+                        const n = Number(document.getElementById('n').value);
+
+                        if (isNaN(x) || isNaN(y) || isNaN(n)) {
+                            alert("Por favor ingresa valores numericos validos");
+                            return;
+                        }
+
+                        currentSamples = gibbs2(n, x, y);
                         createDualCharts();
                     }
                     
