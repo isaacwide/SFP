@@ -1,5 +1,5 @@
 // a qui va ir las funciones para simumar una normal en 2 variables
-// Función para generar números normales
+// Funcion para generar numeros normales
 function normal(n, mu, sigma) {
     let x = [];
     for (let i = 0; i < n; i++) {
@@ -11,7 +11,7 @@ function normal(n, mu, sigma) {
     return x;
 }
 
-// Función para calcular histograma 2D
+// Funcion para calcular histograma 2D
 function calculate2DHistogram(x, y, bins) {
     // Encontrar rangos
     const xMin = Math.min(...x);
@@ -64,11 +64,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // Validar inputs
             if (isNaN(rho) || isNaN(mu1) || isNaN(mu2) || isNaN(sigma1) || isNaN(sigma2) || isNaN(n)) {
-                alert("Por favor ingresa valores numéricos válidos");
+                alert("Por favor ingresa valores numericos validos");
                 return;
             }
 
-            // Generar normales estándar
+            // Generar normales estandar
             let z1 = normal(n, 0, 1);
             let z2 = normal(n, 0, 1);
 
@@ -80,15 +80,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 // Para X|Y (dado un valor inicial de Y)
                 let x = mu1 + sigma1 * z1[i];
                 
-                // Para Y|X (usando el X recién generado)
+                // Para Y|X (usando el X recien generado)
                 let y = mu2 + rho * (sigma2/sigma1) * (x - mu1) + sigma2 * Math.sqrt(1 - rho*rho) * z2[i];
                 
                 x_vals.push(x);
                 y_vals.push(y);
-                z_vals.push(0.5); // Iteración
+                z_vals.push(0.5); // Iteracion
             }
 
-            // Crear traza 3D de dispersión
+            // Crear traza 3D de dispersion
             let trace = {
                 x: x_vals,
                 y: y_vals,
@@ -127,13 +127,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 name: 'Histograma 3D'
             };
 
-            // Configuración del layout
+            // Configuracion del layout
             let layout = {
                 margin: { l: 0, r: 0, b: 0, t: 0 },
                 scene: {
                     xaxis: { title: 'X' },
                     yaxis: { title: 'Y' },
-                    zaxis: { title: 'Iteración' },
+                    zaxis: { title: 'Iteracion' },
                     camera: {
                         eye: { x: 1.5, y: 1.5, z: 1.5 }
                     }
@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", function() {
             };
             window.currentLayout = layout;
 
-            // Dibujar gráfica inicial (scatter3d)
+            // Dibujar grafica inicial (scatter3d)
             Plotly.newPlot('grafica3d', [trace], layout);
             Plotly.newPlot("histo3d", [hist2d], layoutHist);
         });

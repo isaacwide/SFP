@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulaciones Estadísticas</title>
+    <title>Simulaciones Estadisticas</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/c1.css') }}">
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <h1 class="title">Simulaciones Estadísticas</h1>
+            <h1 class="title">Simulaciones Estadisticas</h1>
             <p class="subtitle">Explora el mundo de las distribuciones</p>
             <p class="description">
-                Experimenta con diferentes distribuciones estadísticas de manera interactiva. 
-                Ajusta parámetros y observa los resultados en tiempo real.
+                Experimenta con diferentes distribuciones estadisticas de manera interactiva. 
+                Ajusta parametros y observa los resultados en tiempo real.
             </p>
         </header>
 
@@ -21,10 +21,10 @@
             <a href="/bernoulli" class="distribution-card bernoulli">
                 <div class="card-header">
                     <span class="card-icon">🎯</span>
-                    <h2 class="card-title">Distribución de Bernoulli</h2>
+                    <h2 class="card-title">Distribucion de Bernoulli</h2>
                 </div>
                 <p class="card-description">
-                    Experimento con dos resultados posibles: éxito o fracaso. 
+                    Experimento con dos resultados posibles: exito o fracaso. 
                     Perfecto para modelar eventos binarios.
                 </p>
                 <div class="card-params">
@@ -34,7 +34,7 @@
                     </div>
                     <div class="param-item">
                         <span class="param-value">θ</span>
-                        <span class="param-label">Parámetro</span>
+                        <span class="param-label">Parametro</span>
                     </div>
                 </div>
             </a>
@@ -42,7 +42,7 @@
             <a href="/exponencial" class="distribution-card exponencial">
                 <div class="card-header">
                     <span class="card-icon">⏱</span>
-                    <h2 class="card-title">Distribución Exponencial</h2>
+                    <h2 class="card-title">Distribucion Exponencial</h2>
                 </div>
                 <p class="card-description">
                     Modela el tiempo entre eventos que ocurren de manera continua 
@@ -55,7 +55,7 @@
                     </div>
                     <div class="param-item">
                         <span class="param-value">λ</span>
-                        <span class="param-label">Parámetro</span>
+                        <span class="param-label">Parametro</span>
                     </div>
                 </div>
             </a>
@@ -63,16 +63,16 @@
             <a href="/multinomial" class="distribution-card multinomial">
                 <div class="card-header">
                     <span class="card-icon">🎲</span>
-                    <h2 class="card-title">Distribución Multinomial</h2>
+                    <h2 class="card-title">Distribucion Multinomial</h2>
                 </div>
                 <p class="card-description">
-                    Generalización de la distribución binomial para múltiples 
-                    categorías. Ideal para dados y eventos con varias opciones.
+                    Generalizacion de la distribucion binomial para multiples 
+                    categorias. Ideal para dados y eventos con varias opciones.
                 </p>
                 <div class="card-params">
                     <div class="param-item">
                         <span class="param-value">N</span>
-                        <span class="param-label">Categorías</span>
+                        <span class="param-label">Categorias</span>
                     </div>
                     <div class="param-item">
                         <span class="param-value">p₁...pₖ</span>
@@ -84,10 +84,10 @@
             <a href="/binomial" class="distribution-card binomial">
                 <div class="card-header">
                     <span class="card-icon">🪙</span>
-                    <h2 class="card-title">Distribución Binomial</h2>
+                    <h2 class="card-title">Distribucion Binomial</h2>
                 </div>
                 <p class="card-description">
-                    Número de éxitos en una secuencia de experimentos 
+                    Numero de exitos en una secuencia de experimentos 
                     independientes de Bernoulli con la misma probabilidad.
                 </p>
                 <div class="card-params">
@@ -105,11 +105,11 @@
             <a href="/normal" class="distribution-card normal">
                 <div class="card-header">
                     <span class="card-icon">📈</span>
-                    <h2 class="card-title">Distribución Normal</h2>
+                    <h2 class="card-title">Distribucion Normal</h2>
                 </div>
                 <p class="card-description">
-                    La famosa campana de Gauss. Fundamental en estadística 
-                    y presente en muchos fenómenos naturales.
+                    La famosa campana de Gauss. Fundamental en estadistica 
+                    y presente en muchos fenomenos naturales.
                 </p>
                 <div class="card-params">
                     <div class="param-item">
@@ -126,15 +126,15 @@
             <a href="/gebbs" class="distribution-card gebbs">
                 <div class="card-header">
                     <span class="card-icon">🔬</span>
-                    <h2 class="card-title">Simulación de Gibbs</h2>
+                    <h2 class="card-title">Simulacion de Gibbs</h2>
                 </div>
                 <p class="card-description">
-                    Método MCMC que genera secuencias de observaciones de una distribución multivariada compleja mediante el muestreo iterativo de sus distribuciones condicionales.
+                    Metodo MCMC que genera secuencias de observaciones de una distribucion multivariada compleja mediante el muestreo iterativo de sus distribuciones condicionales.
                 </p>
                 <div class="card-params">
                     <div class="param-item">
                         <span class="param-value">MCMC</span>
-                        <span class="param-label">Método</span>
+                        <span class="param-label">Metodo</span>
                     </div>
                     <div class="param-item">
                         <span class="param-value">∞</span>
@@ -148,7 +148,7 @@
                     <h2 class="card-title">Normal Bivariada</h2>
                 </div>
                 <p class="card-description">
-                    Simulación y muestreo de una distribución normal con dos variables correlacionadas. Explora la relación entre medias, varianzas y covarianza.
+                    Simulacion y muestreo de una distribucion normal con dos variables correlacionadas. Explora la relacion entre medias, varianzas y covarianza.
                 </p>
                 <div class="card-params">
                     <div class="param-item">
@@ -161,7 +161,7 @@
                     </div>
                     <div class="param-item">
                         <span class="param-value">ρ</span>
-                        <span class="param-label">Correlación</span>
+                        <span class="param-label">Correlacion</span>
                     </div>
                 </div>
             </a>

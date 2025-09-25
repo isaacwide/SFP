@@ -31,6 +31,63 @@
         .chart-hidden {
             display: none !important;
         }
+        
+        .download-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .info-card {
+            margin-bottom: 20px;
+        }
+
+        /* Nuevos estilos para vista dual */
+        .dual-charts-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .chart-wrapper {
+            flex: 1;
+            min-width: 400px;
+            max-width: 650px;
+        }
+
+        .chart-title {
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+            padding: 8px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .single-chart-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            .dual-charts-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .chart-wrapper {
+                width: 100%;
+                max-width: 600px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -42,7 +99,7 @@
         <div class="content-wrapper">
             <div class="left-panel">
                 <div class="info-card">
-                    <h3>⚙️ Parámetros de Simulación</h3>
+                    <h3>⚙️ Parametros de Simulacion</h3>
                     <form id="formulario" class="param-form" onsubmit="return false;">
                         {% if distribucion == 'gebbs' %}
                         <div class="input-group">
@@ -54,17 +111,15 @@
                             <input type="number" id="y" name="y" min="0" max="10" value="1" required>
                             <small>Valor inicial para y</small>
 
-                            <label for="n">Número de iteraciones:</label>
+                            <label for="n">Numero de iteraciones:</label>
                             <input type="number" id="n" name="n" min="100" max="100000" value="1000" required>
                             <small>Cantidad de muestras a generar</small>
                         </div>
-
-                        <script src="{{ url_for('static', filename='js/3dgrafic.js') }}"></script>
                         {% endif %}
 
                         {% if distribucion == '2normal' %}
                         <div class="input-group">
-                            <label for="rho">Correlación ρ:</label>
+                            <label for="rho">Correlacion ρ:</label>
                             <input type="number" id="rho" name="rho" min="0" max="1" step="0.01" value="0" required>
                             <small>Valores entre (0,1)</small>
 
@@ -84,16 +139,20 @@
                             <input type="number" id="sigma2" name="sigma2" min="0.01" max="100" step="0.01" value="1" required>
                             <small>Varianza de la segunda variable</small>
 
-                            <label for="n">Número de iteraciones:</label>
+                            <label for="n">Numero de iteraciones:</label>
                             <input type="number" id="n" name="n" min="100" max="100000" value="1000" required>
                             <small>Cantidad de muestras a generar</small>
                         </div>
-
-                        <script src="{{ url_for('static', filename='js/normal3d.js') }}"></script>
                         {% endif %}
 
-                        <button type="submit" class="update-button">🔄 Actualizar Simulación</button>
+                        <button type="submit" class="update-button">🔄 Actualizar Simulacion</button>
                     </form>
+                </div>
+
+            <!-- card pa la descarga -->
+                <div class="info-card" id="download-card" style="display: none;">
+                    <h3>💾 Descargar Datos</h3>
+                    <button id="download-btn" class="download-button">⬇️ Descargar CSV</button>
                 </div>
 
                 <div style="text-align: center;">
@@ -102,62 +161,383 @@
             </div>
 
             <div class="right-panel">
-                <button class="toggle-button" onclick="toggleChart()">
-                    <span id="button-icon">🎨</span>
-                    <span id="button-text">Ver Histograma 3D</span>
+                <button class="toggle-button" onclick="toggleView()">
+                    <span id="button-icon">📊</span>
+                    <span id="button-text">Ver Histograma 2D</span>
                 </button>
 
-                <div class="grafico-container">
-                    <div id="grafica3d" style="width:600px; height:600px;"></div>
-                    <div id="histo3d" style="width:600px; height:600px;" class="chart-hidden"></div>
+                <!-- Vista dual: Gráfico 3D + Histograma 3D -->
+                <div id="dual-view" class="dual-charts-container">
+                    <div class="chart-wrapper">
+                        <div class="chart-title">🎯 Gráfico 3D</div>
+                        <div id="grafica3d" style="width:100%; height:420px;"></div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <div class="chart-title">📈 Histograma 3D</div>
+                        <div id="histograma3d" style="width:100%; height:420px;"></div>
+                    </div>
+                </div>
+
+                <!-- Vista individual: Histograma 2D -->
+                <div id="single-view" class="single-chart-container chart-hidden">
+                    <div class="chart-wrapper" style="max-width: 700px;">
+                        <div class="chart-title">📊 Histograma 2D</div>
+                        <div id="histo2d" style="width:100%; height:500px;"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let currentView = 'scatter3d'; // Puede ser 'scatter3d', 'histogram3d', o 'histogram2d'
+        let currentView = 'dual'; // 'dual' o 'histogram2d'
+        let currentSamples = [];
+        let currentDistribution = '{{ distribucion }}';
 
-        function toggleChart() {
-            const grafica3d = document.getElementById('grafica3d');
-            const histo3d = document.getElementById('histo3d');
+        // csv
+        function downloadCsv(data, filename) {
+            const blob = new Blob([data], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+
+        // Funcion para calcular histograma 2D
+        function calculate2DHistogram(x, y, bins) {
+            const xMin = Math.min(...x);
+            const xMax = Math.max(...x);
+            const yMin = Math.min(...y);
+            const yMax = Math.max(...y);
+            
+            const xBinSize = (xMax - xMin) / bins;
+            const yBinSize = (yMax - yMin) / bins;
+            
+            const counts = Array(bins).fill().map(() => Array(bins).fill(0));
+            
+            for (let i = 0; i < x.length; i++) {
+                const xBin = Math.min(bins - 1, Math.floor((x[i] - xMin) / xBinSize));
+                const yBin = Math.min(bins - 1, Math.floor((y[i] - yMin) / yBinSize));
+                counts[xBin][yBin]++;
+            }
+            
+            const xCenters = [];
+            const yCenters = [];
+            
+            for (let i = 0; i < bins; i++) {
+                xCenters.push(xMin + (i + 0.5) * xBinSize);
+                yCenters.push(yMin + (i + 0.5) * yBinSize);
+            }
+            
+            return {
+                x: xCenters,
+                y: yCenters,
+                z: counts
+            };
+        }
+
+        // Funciones para Gebbs
+        function x_y(y) {
+            let u_1 = Math.random();
+            let delta1 = Math.sqrt(Math.max((4 * (y ** 2)) + (12 * y) + 4 + (32 * u_1) + (24 * y * u_1), 0));
+            return ((-(3 * y) - 2 + delta1) / 2);
+        }
+
+        function y_x(x) {
+            let u_1 = Math.random();
+            let delta2 = Math.sqrt(Math.max((x ** 2) + (2 * x) + 1 + (6 * u_1 * x) + (15 * x), 0));
+            return ((-(2 * x) - 2 + (2 * delta2)) / 3);
+        }
+
+        function gebbs(n, x, y) {
+            let x0 = x;
+            let y0 = y;
+            let samples = [[x0, y0]];
+
+            for (let i = 0; i < n; i++) {
+                let x_n = x_y(samples[i][1]);
+                let y_n = y_x(samples[i][0]);
+                samples.push([x_n, y_n]);
+            }
+            return samples;
+        }
+
+        // Funciones para Normal Bivariada
+        function normal(n, mu, sigma) {
+            let x = [];
+            for (let i = 0; i < n; i++) {
+                let u1 = Math.random();
+                let u2 = Math.random();
+                let z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+                x.push(z0 * sigma + mu);
+            }
+            return x;
+        }
+
+        // Nueva función para alternar vistas
+        function toggleView() {
+            const dualView = document.getElementById('dual-view');
+            const singleView = document.getElementById('single-view');
             const buttonIcon = document.getElementById('button-icon');
             const buttonText = document.getElementById('button-text');
 
-            // Ocultar todas las gráficas primero
-            grafica3d.classList.add('chart-hidden');
-            histo3d.classList.add('chart-hidden');
-            
-            // Determinar qué vista mostrar next
-            if (currentView === 'scatter3d') {
-                currentView = 'histogram3d';
-                grafica3d.classList.remove('chart-hidden');
+            if (currentView === 'dual') {
+                // Cambiar a vista de histograma 2D
+                currentView = 'histogram2d';
+                dualView.classList.add('chart-hidden');
+                singleView.classList.remove('chart-hidden');
+                buttonIcon.textContent = '🎯';
+                buttonText.textContent = 'Ver Gráficos 3D';
+                
+                // Crear histograma 2D si hay datos
+                if (currentSamples.length > 0) {
+                    createHistogram2D();
+                }
+            } else {
+                // Cambiar a vista dual
+                currentView = 'dual';
+                singleView.classList.add('chart-hidden');
+                dualView.classList.remove('chart-hidden');
                 buttonIcon.textContent = '📊';
                 buttonText.textContent = 'Ver Histograma 2D';
-                // Mostrar histograma 3D en el contenedor de grafica3d
-                Plotly.newPlot('grafica3d', [window.currentTraces.histogram3d], window.currentLayout);
-            } else if (currentView === 'histogram3d') {
-                currentView = 'histogram2d';
-                histo3d.classList.remove('chart-hidden');
-                buttonIcon.textContent = '🔍';
-                buttonText.textContent = 'Ver Gráfica 3D';
-            } else {
-                currentView = 'scatter3d';
-                grafica3d.classList.remove('chart-hidden');
-                buttonIcon.textContent = '🎨';
-                buttonText.textContent = 'Ver Histograma 3D';
-                // Mostrar scatter 3D
-                Plotly.newPlot('grafica3d', [window.currentTraces.scatter], window.currentLayout);
-            }
-            
-            // Redimensionar Plotly si es necesario
-            const activeChart = currentView === 'histogram2d' ? histo3d : grafica3d;
-            if (window.Plotly && activeChart.firstElementChild) {
-                setTimeout(() => {
-                    Plotly.Plots.resize(activeChart.firstElementChild);
-                }, 100);
             }
         }
+
+        // Función para crear histograma 2D
+        function createHistogram2D() {
+            if (currentDistribution === '2normal') {
+                const x_vals = currentSamples.map(p => p[0]);
+                const y_vals = currentSamples.map(p => p[1]);
+                
+                let hist2d = {
+                    x: x_vals,
+                    y: y_vals,
+                    type: "histogram2d",
+                    colorscale: "Viridis",
+                    name: 'Histograma 2D'
+                };
+                
+                const layout = {
+                    margin: { l: 40, r: 20, b: 40, t: 20 },
+                    xaxis: { title: 'X' },
+                    yaxis: { title: 'Y' }
+                };
+                
+                Plotly.newPlot("histo2d", [hist2d], layout);
+            } else if (currentDistribution === 'gebbs') {
+                // Para Gibbs, crear histograma 2D de las posiciones
+                const x_vals = currentSamples.map(p => p[0]);
+                const y_vals = currentSamples.map(p => p[1]);
+                
+                let hist2d = {
+                    x: x_vals,
+                    y: y_vals,
+                    type: "histogram2d",
+                    colorscale: "Viridis",
+                    name: 'Histograma 2D'
+                };
+                
+                const layout = {
+                    margin: { l: 40, r: 20, b: 40, t: 20 },
+                    xaxis: { title: 'X' },
+                    yaxis: { title: 'Y' }
+                };
+                
+                Plotly.newPlot("histo2d", [hist2d], layout);
+            }
+        }
+
+        // Función para crear los gráficos duales
+        function createDualCharts() {
+            if (currentDistribution === 'gebbs') {
+                // Gráfico 3D scatter
+                let trace3d = {
+                    x: currentSamples.map(p => p[0]),
+                    y: currentSamples.map(p => p[1]),
+                    z: currentSamples.map((p, i) => i),
+                    mode: 'markers',
+                    type: 'scatter3d',
+                    marker: { 
+                        size: 3, 
+                        color: currentSamples.map((p, i) => i), 
+                        colorscale: 'Viridis',
+                        opacity: 0.8
+                    },
+                    name: 'Muestras Gibbs'
+                };
+
+                const layout3d = {
+                    margin: { l: 10, r: 10, b: 10, t: 10 },
+                    scene: {
+                        xaxis: { title: 'X' },
+                        yaxis: { title: 'Y' },
+                        zaxis: { title: 'Iteración' },
+                        camera: { eye: { x: 1.5, y: 1.5, z: 1.5 } }
+                    }
+                };
+
+                Plotly.newPlot('grafica3d', [trace3d], layout3d);
+
+                // Histograma 3D
+                const histogramData = calculate2DHistogram(
+                    currentSamples.map(p => p[0]), 
+                    currentSamples.map(p => p[1]), 
+                    20
+                );
+                
+                let histogram3DTrace = {
+                    x: histogramData.x,
+                    y: histogramData.y,
+                    z: histogramData.z,
+                    type: 'surface',
+                    colorscale: 'Viridis',
+                    opacity: 0.8,
+                    name: 'Histograma 3D'
+                };
+                
+                Plotly.newPlot('histograma3d', [histogram3DTrace], layout3d);
+
+            } else if (currentDistribution === '2normal') {
+                const x_vals = currentSamples.map(p => p[0]);
+                const y_vals = currentSamples.map(p => p[1]);
+
+                // Gráfico 3D scatter
+                let trace3d = {
+                    x: x_vals,
+                    y: y_vals,
+                    z: Array(x_vals.length).fill(0.5),
+                    mode: 'markers',
+                    type: 'scatter3d',
+                    marker: {
+                        size: 3,
+                        color: Array(x_vals.length).fill(0.5),
+                        colorscale: 'Viridis',
+                        opacity: 0.8
+                    },
+                    name: 'Muestras Normales'
+                };
+
+                const layout3d = {
+                    margin: { l: 10, r: 10, b: 10, t: 10 },
+                    scene: {
+                        xaxis: { title: 'X' },
+                        yaxis: { title: 'Y' },
+                        zaxis: { title: 'Z' },
+                        camera: { eye: { x: 1.5, y: 1.5, z: 1.5 } }
+                    }
+                };
+
+                Plotly.newPlot('grafica3d', [trace3d], layout3d);
+
+                // Histograma 3D
+                const histogramData = calculate2DHistogram(x_vals, y_vals, 20);
+                
+                let histogram3DTrace = {
+                    x: histogramData.x,
+                    y: histogramData.y,
+                    z: histogramData.z,
+                    type: 'surface',
+                    colorscale: 'Viridis',
+                    opacity: 0.8,
+                    name: 'Histograma 3D'
+                };
+                
+                Plotly.newPlot('histograma3d', [histogram3DTrace], layout3d);
+            }
+        }
+
+        //PUROS CORRIDOS TUMBADOS VIEJILLO🗣️🗣️🗣️
+        // descarga
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById("formulario");
+            const downloadCard = document.getElementById("download-card");
+            const downloadBtn = document.getElementById("download-btn");
+
+            if (form) {
+                form.addEventListener("submit", function(e) {
+                    e.preventDefault();
+                    
+                    if (currentDistribution === 'gebbs') {
+                        const x = Number(document.getElementById('x').value);
+                        const y = Number(document.getElementById('y').value);
+                        const n = Number(document.getElementById('n').value);
+
+                        if (isNaN(x) || isNaN(y) || isNaN(n)) {
+                            alert("Por favor ingresa valores numericos validos");
+                            return;
+                        }
+
+                        currentSamples = gebbs(n, x, y);
+                        createDualCharts();
+                        
+                    } else if (currentDistribution === '2normal') {
+                        const rho = parseFloat(document.getElementById('rho').value);
+                        const mu1 = parseFloat(document.getElementById('miu1').value);
+                        const mu2 = parseFloat(document.getElementById('miu2').value);
+                        const sigma1 = parseFloat(document.getElementById('sigma1').value);
+                        const sigma2 = parseFloat(document.getElementById('sigma2').value);
+                        const n = parseInt(document.getElementById('n').value);
+
+                        if (isNaN(rho) || isNaN(mu1) || isNaN(mu2) || isNaN(sigma1) || isNaN(sigma2) || isNaN(n)) {
+                            alert("Por favor ingresa valores numericos validos");
+                            return;
+                        }
+
+                        let z1 = normal(n, 0, 1);
+                        let z2 = normal(n, 0, 1);
+
+                        let x_vals = [];
+                        let y_vals = [];
+                        
+                        for (let i = 0; i < n; i++) {
+                            let x = mu1 + sigma1 * z1[i];
+                            let y = mu2 + rho * (sigma2/sigma1) * (x - mu1) + sigma2 * Math.sqrt(1 - rho*rho) * z2[i];
+                            x_vals.push(x);
+                            y_vals.push(y);
+                        }
+
+                        currentSamples = x_vals.map((x, i) => [x, y_vals[i]]);
+                        createDualCharts();
+                    }
+                    
+                    downloadCard.style.display = 'block';
+                });
+            }
+
+            if (downloadBtn) {
+                downloadBtn.addEventListener("click", function() {
+                    if (currentSamples.length === 0) {
+                        alert("No hay datos para descargar. Primero ejecuta la simulacion.");
+                        return;
+                    }
+                    
+                    let csvData = "";
+                    if (currentDistribution === 'gebbs') {
+                        // Encabezados CSV
+                        csvData = "Iteracion,Valor_X,Valor_Y\n";
+                        // Datos
+                        currentSamples.forEach((sample, index) => {
+                            csvData += `${index},${sample[0].toFixed(6)},${sample[1].toFixed(6)}\n`;
+                        });
+                    } else if (currentDistribution === '2normal') {
+                        // Encabezados CSV
+                        csvData = "Muestra,Valor_X,Valor_Y\n";
+                        // Datos
+                        currentSamples.forEach((sample, index) => {
+                            csvData += `${index},${sample[0].toFixed(6)},${sample[1].toFixed(6)}\n`;
+                        });
+                    }
+                    
+                    downloadCsv(csvData, `simulacion_${currentDistribution}.csv`);
+                });
+            }
+        });
     </script>
 </body>
 </html>

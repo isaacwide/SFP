@@ -12,7 +12,7 @@ def simBernoulli(theta, n):
     for numero in x_n:
         if numero < theta:
             aguilas += 1
-            secuencia.append(0)  # águila
+            secuencia.append(0)  # aguila
         else:
             soles += 1
             secuencia.append(1)  #sol
