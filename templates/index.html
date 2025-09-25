@@ -8,17 +8,166 @@
 </head>
 <body>
     <div class="container">
-        <h1>Simulaciones de Distribuciones Estadísticas</h1>
-        <p>Selecciona una simulación para ejecutar:</p>
-        
-        <div class="button-grid">
-            <a href="/bernoulli" class="sim-button">Distribución de Bernoulli</a>
-            <a href="/exponencial" class="sim-button">Distribución Exponencial</a>
-            <a href="/multinomial" class="sim-button">Distribución Multinomial</a>
-            <a href="/binomial" class="sim-button">Distribución Binomial</a>
-            <a href="/normal" class="sim-button">Distribución Normal</a>
-            <a href="/gebbs" class="sim-button">Simulacion de gebbs</a>
-        </div>
+        <header class="header">
+            <h1 class="title">Simulaciones Estadísticas</h1>
+            <p class="subtitle">Explora el mundo de las distribuciones</p>
+            <p class="description">
+                Experimenta con diferentes distribuciones estadísticas de manera interactiva. 
+                Ajusta parámetros y observa los resultados en tiempo real.
+            </p>
+        </header>
+
+        <main class="distributions-grid">
+            <a href="/bernoulli" class="distribution-card bernoulli">
+                <div class="card-header">
+                    <span class="card-icon">🎯</span>
+                    <h2 class="card-title">Distribución de Bernoulli</h2>
+                </div>
+                <p class="card-description">
+                    Experimento con dos resultados posibles: éxito o fracaso. 
+                    Perfecto para modelar eventos binarios.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">2</span>
+                        <span class="param-label">Resultados</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">θ</span>
+                        <span class="param-label">Parámetro</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/exponencial" class="distribution-card exponencial">
+                <div class="card-header">
+                    <span class="card-icon">⏱</span>
+                    <h2 class="card-title">Distribución Exponencial</h2>
+                </div>
+                <p class="card-description">
+                    Modela el tiempo entre eventos que ocurren de manera continua 
+                    e independiente a una tasa constante.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">∞</span>
+                        <span class="param-label">Rango</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">λ</span>
+                        <span class="param-label">Parámetro</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/multinomial" class="distribution-card multinomial">
+                <div class="card-header">
+                    <span class="card-icon">🎲</span>
+                    <h2 class="card-title">Distribución Multinomial</h2>
+                </div>
+                <p class="card-description">
+                    Generalización de la distribución binomial para múltiples 
+                    categorías. Ideal para dados y eventos con varias opciones.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">N</span>
+                        <span class="param-label">Categorías</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">p₁...pₖ</span>
+                        <span class="param-label">Probabilidades</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/binomial" class="distribution-card binomial">
+                <div class="card-header">
+                    <span class="card-icon">🪙</span>
+                    <h2 class="card-title">Distribución Binomial</h2>
+                </div>
+                <p class="card-description">
+                    Número de éxitos en una secuencia de experimentos 
+                    independientes de Bernoulli con la misma probabilidad.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">n</span>
+                        <span class="param-label">Intentos</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">p</span>
+                        <span class="param-label">Probabilidad</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/normal" class="distribution-card normal">
+                <div class="card-header">
+                    <span class="card-icon">📈</span>
+                    <h2 class="card-title">Distribución Normal</h2>
+                </div>
+                <p class="card-description">
+                    La famosa campana de Gauss. Fundamental en estadística 
+                    y presente en muchos fenómenos naturales.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">μ</span>
+                        <span class="param-label">Media</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">σ²</span>
+                        <span class="param-label">Varianza</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/gebbs" class="distribution-card gebbs">
+                <div class="card-header">
+                    <span class="card-icon">🔬</span>
+                    <h2 class="card-title">Simulación de Gibbs</h2>
+                </div>
+                <p class="card-description">
+                    Método MCMC que genera secuencias de observaciones de una distribución multivariada compleja mediante el muestreo iterativo de sus distribuciones condicionales.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">MCMC</span>
+                        <span class="param-label">Método</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">∞</span>
+                        <span class="param-label">Cadena</span>
+                    </div>
+                </div>
+            </a>
+            <a href="/normal_2" class="distribution-card normal2">
+                <div class="card-header">
+                    <span class="card-icon">🔗</span>
+                    <h2 class="card-title">Normal Bivariada</h2>
+                </div>
+                <p class="card-description">
+                    Simulación y muestreo de una distribución normal con dos variables correlacionadas. Explora la relación entre medias, varianzas y covarianza.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">μ₁, μ₂</span>
+                        <span class="param-label">Medias</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">σ₁², σ₂²</span>
+                        <span class="param-label">Varianzas</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">ρ</span>
+                        <span class="param-label">Correlación</span>
+                    </div>
+                </div>
+            </a>
+        </main>
+
+
     </div>
 </body>
 </html>   

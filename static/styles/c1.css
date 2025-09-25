@@ -1,62 +1,177 @@
-/* Reset básico */
-        * {
-            box-sizing: border-box;
+* {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f8fa;
-            color: #333;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #212674;
+            line-height: 1.6;
+            color: #334155;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fdfdfd;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #7a8eaa;
+            margin-bottom: 12px;
+        }
+
+        .description {
+            font-size: 1rem;
+            color: #7a8eaa;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .distributions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .distribution-card {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        .distribution-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-color: #cbd5e1;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-right: 12px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .card-description {
+            color: #64748b;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .card-params {
+            display: flex;
+            gap: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .param-item {
+            flex: 1;
             text-align: center;
         }
 
-
-
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 20px;
+        .param-value {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
         }
 
-        p {
-            margin-bottom: 30px;
-            font-size: 1.1em;
+        .param-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 4px;
         }
 
-        .button-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
+        /* Colores de acento para cada distribución */
+        .bernoulli .card-icon { color: #dc2626; }
+        .exponencial .card-icon { color: #059669; }
+        .multinomial .card-icon { color: #2563eb; }
+        .binomial .card-icon { color: #7c3aed; }
+        .normal .card-icon { color: #ea580c; }
+        .gebbs .card-icon { color: #db2777; }
+
+        .bernoulli:hover { border-color: #dc2626; }
+        .exponencial:hover { border-color: #059669; }
+        .multinomial:hover { border-color: #2563eb; }
+        .binomial:hover { border-color: #7c3aed; }
+        .normal:hover { border-color: #ea580c; }
+        .gebbs:hover { border-color: #db2777; }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            color: #94a3b8;
+            font-size: 0.9rem;
         }
 
-        .sim-button {
-            text-decoration: none;
-            background-color: #3498db;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-
-        .sim-button:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-        }
-
-        @media (max-width: 500px) {
+        /* Responsive */
+        @media (max-width: 768px) {
             .container {
-                padding: 25px 20px;
+                padding: 20px 16px;
             }
 
-            h1 {
-                font-size: 22px;
+            .title {
+                font-size: 2rem;
             }
 
-            .sim-button {
-                font-size: 0.95em;
-                padding: 12px;
+            .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .distributions-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .distribution-card {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .title {
+                font-size: 1.75rem;
+            }
+
+            .card-params {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .param-item {
+                text-align: left;
             }
         }

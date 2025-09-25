@@ -1,27 +1,14 @@
-function x_y(y) {
-    let u = Math.random();
-    const discriminant = 4 * (y*y + 3*y + 1 + u*(6*y + 8));
-    return (-3*y - 2 + Math.sqrt(Math.max(0, discriminant))) / 2;
-}
-
-function y_x(x) {
-    let u = Math.random();
-    const base = x + 1;
-    const discriminant = base*base + 3*u*(2*x + 5);
-    return 2*(-base + Math.sqrt(Math.max(0, discriminant))) / 3;
-}
-
-function gebbs(n, x, y) {
-    let x0 = x;
-    let y0 = y;
-    let samples = [[x0, y0]];
-
+// a qui va ir las funciones para simumar una normal en 2 variables
+// Función para generar números normales
+function normal(n, mu, sigma) {
+    let x = [];
     for (let i = 0; i < n; i++) {
-        let x_n = x_y(samples[i][1]);
-        let y_n = y_x(samples[i][0]);
-        samples.push([x_n, y_n]);
+        let u1 = Math.random();
+        let u2 = Math.random();
+        let z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+        x.push(z0 * sigma + mu);
     }
-    return samples;
+    return x;
 }
 
 // Función para calcular histograma 2D
@@ -68,23 +55,38 @@ document.addEventListener("DOMContentLoaded", function() {
         form.addEventListener("submit", function(e) {
             e.preventDefault();
 
-            const x = Number(document.getElementById('x').value);
-            const y = Number(document.getElementById('y').value);
-            const n = Number(document.getElementById('n').value);
+            const rho = parseFloat(document.getElementById('rho').value);
+            const mu1 = parseFloat(document.getElementById('miu1').value);
+            const mu2 = parseFloat(document.getElementById('miu2').value);
+            const sigma1 = parseFloat(document.getElementById('sigma1').value);
+            const sigma2 = parseFloat(document.getElementById('sigma2').value);
+            const n = parseInt(document.getElementById('n').value);
 
             // Validar inputs
-            if (isNaN(x) || isNaN(y) || isNaN(n)) {
+            if (isNaN(rho) || isNaN(mu1) || isNaN(mu2) || isNaN(sigma1) || isNaN(sigma2) || isNaN(n)) {
                 alert("Por favor ingresa valores numéricos válidos");
                 return;
             }
 
-            // Calcular muestras
-            let samples = gebbs(n, x, y);
+            // Generar normales estándar
+            let z1 = normal(n, 0, 1);
+            let z2 = normal(n, 0, 1);
 
-            // Preparar datos para la gráfica
-            let x_vals = samples.map(p => p[0]);
-            let y_vals = samples.map(p => p[1]);
-            let z_vals = samples.map((p, i) => 0.5); // Iteración como eje z
+            // Generar normales correlacionadas
+            let x_vals = [];
+            let y_vals = [];
+            let z_vals = [];
+            for (let i = 0; i < n; i++) {
+                // Para X|Y (dado un valor inicial de Y)
+                let x = mu1 + sigma1 * z1[i];
+                
+                // Para Y|X (usando el X recién generado)
+                let y = mu2 + rho * (sigma2/sigma1) * (x - mu1) + sigma2 * Math.sqrt(1 - rho*rho) * z2[i];
+                
+                x_vals.push(x);
+                y_vals.push(y);
+                z_vals.push(0.5); // Iteración
+            }
 
             // Crear traza 3D de dispersión
             let trace = {
@@ -93,13 +95,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 z: z_vals,
                 mode: 'markers',
                 type: 'scatter3d',
-                marker: { 
-                    size: 3, 
-                    color: z_vals, 
+                marker: {
+                    size: 3,
+                    color: z_vals,
                     colorscale: 'Viridis',
                     opacity: 0.8
                 },
-                name: 'Muestras Gibbs'
+                name: 'Muestras Normales'
             };
 
             // Crear histograma 2D
@@ -138,6 +140,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             };
 
+            let layoutHist = {
+                title: "Histograma 2D",
+                xaxis: { title: "X" },
+                yaxis: { title: "Y" }
+            };
+
             // Almacenar trazas y layout para alternar entre ellas
             window.currentTraces = {
                 scatter: trace,
@@ -148,7 +156,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // Dibujar gráfica inicial (scatter3d)
             Plotly.newPlot('grafica3d', [trace], layout);
-            Plotly.newPlot("histo3d", [hist2d]);
+            Plotly.newPlot("histo3d", [hist2d], layoutHist);
         });
     }
 });

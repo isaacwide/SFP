@@ -6,6 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ titulo }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/c2.css') }}">
+    <style>
+        .toggle-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 auto 20px auto;
+        }
+
+        .toggle-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .chart-hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
     <div class="main-container">
@@ -17,7 +43,6 @@
             <div class="left-panel">
                 <div class="info-card">
                     <h3>⚙️ Parámetros de Simulación</h3>
-                    <!-- FORMULARIO CORREGIDO -->
                     <form id="formulario" class="param-form" onsubmit="return false;">
                         {% if distribucion == 'gebbs' %}
                         <div class="input-group">
@@ -37,6 +62,36 @@
                         <script src="{{ url_for('static', filename='js/3dgrafic.js') }}"></script>
                         {% endif %}
 
+                        {% if distribucion == '2normal' %}
+                        <div class="input-group">
+                            <label for="rho">Correlación ρ:</label>
+                            <input type="number" id="rho" name="rho" min="0" max="1" step="0.01" value="0" required>
+                            <small>Valores entre (0,1)</small>
+
+                            <label for="miu1">μ₁:</label>
+                            <input type="number" id="miu1" name="miu1" min="-10" max="10" value="0" required>
+                            <small>Media de la primera variable</small>
+
+                            <label for="sigma1">σ₁²:</label>
+                            <input type="number" id="sigma1" name="sigma1" min="0.01" max="100" step="0.01" value="1" required>
+                            <small>Varianza de la primera variable</small>
+
+                            <label for="miu2">μ₂:</label>
+                            <input type="number" id="miu2" name="miu2" min="-10" max="10" value="0" required>
+                            <small>Media de la segunda variable</small>
+
+                            <label for="sigma2">σ₂²:</label>
+                            <input type="number" id="sigma2" name="sigma2" min="0.01" max="100" step="0.01" value="1" required>
+                            <small>Varianza de la segunda variable</small>
+
+                            <label for="n">Número de iteraciones:</label>
+                            <input type="number" id="n" name="n" min="100" max="100000" value="1000" required>
+                            <small>Cantidad de muestras a generar</small>
+                        </div>
+
+                        <script src="{{ url_for('static', filename='js/normal3d.js') }}"></script>
+                        {% endif %}
+
                         <button type="submit" class="update-button">🔄 Actualizar Simulación</button>
                     </form>
                 </div>
@@ -47,13 +102,62 @@
             </div>
 
             <div class="right-panel">
+                <button class="toggle-button" onclick="toggleChart()">
+                    <span id="button-icon">🎨</span>
+                    <span id="button-text">Ver Histograma 3D</span>
+                </button>
+
                 <div class="grafico-container">
                     <div id="grafica3d" style="width:600px; height:600px;"></div>
+                    <div id="histo3d" style="width:600px; height:600px;" class="chart-hidden"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    
+    <script>
+        let currentView = 'scatter3d'; // Puede ser 'scatter3d', 'histogram3d', o 'histogram2d'
+
+        function toggleChart() {
+            const grafica3d = document.getElementById('grafica3d');
+            const histo3d = document.getElementById('histo3d');
+            const buttonIcon = document.getElementById('button-icon');
+            const buttonText = document.getElementById('button-text');
+
+            // Ocultar todas las gráficas primero
+            grafica3d.classList.add('chart-hidden');
+            histo3d.classList.add('chart-hidden');
+            
+            // Determinar qué vista mostrar next
+            if (currentView === 'scatter3d') {
+                currentView = 'histogram3d';
+                grafica3d.classList.remove('chart-hidden');
+                buttonIcon.textContent = '📊';
+                buttonText.textContent = 'Ver Histograma 2D';
+                // Mostrar histograma 3D en el contenedor de grafica3d
+                Plotly.newPlot('grafica3d', [window.currentTraces.histogram3d], window.currentLayout);
+            } else if (currentView === 'histogram3d') {
+                currentView = 'histogram2d';
+                histo3d.classList.remove('chart-hidden');
+                buttonIcon.textContent = '🔍';
+                buttonText.textContent = 'Ver Gráfica 3D';
+            } else {
+                currentView = 'scatter3d';
+                grafica3d.classList.remove('chart-hidden');
+                buttonIcon.textContent = '🎨';
+                buttonText.textContent = 'Ver Histograma 3D';
+                // Mostrar scatter 3D
+                Plotly.newPlot('grafica3d', [window.currentTraces.scatter], window.currentLayout);
+            }
+            
+            // Redimensionar Plotly si es necesario
+            const activeChart = currentView === 'histogram2d' ? histo3d : grafica3d;
+            if (window.Plotly && activeChart.firstElementChild) {
+                setTimeout(() => {
+                    Plotly.Plots.resize(activeChart.firstElementChild);
+                }, 100);
+            }
+        }
+    </script>
 </body>
 </html>

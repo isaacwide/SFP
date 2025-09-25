@@ -53,13 +53,13 @@
                         {% if distribucion == 'multinomial' %}
                         <div class="input-group">
                             <label for="n">Número de simulaciones:</label>
-                            <input type="number" id="n" name="n" min="1000" max="100000" value="{{ n }}" required>
+                            <input type="number" id="n" name="n" min="100" max="100000" value="{{ n }}" required>
                             <small>Cantidad de experimentos</small>
                         </div>
                         <div class="input-group">
-                            <label for="caras">Número de caras:</label>
-                            <input type="number" id="caras" name="caras" min="2" max="20" value="{{ caras }}" required>
-                            <small>Caras del dado (2-20)</small>
+                            <label for="caras">Cantidad de variables theta:</label>
+                            <input type="number" id="caras" name="caras" min="2" max="1000" value="{{ caras }}" required>
+                            <small>Caras del dado (2-1000)</small>
                         </div>
                         <div class="input-group">
                             <input type="checkbox" id="uniforme" name="uniforme" value="1"
@@ -81,7 +81,7 @@
                             <small>Número de intentos por simulación</small>
                         </div>
                         <div class="input-group">
-                            <label for="repeticiones">Repeticiones:</label>
+                            <label for="repeticiones">N repeticiones:</label>
                             <input type="number" id="repeticiones" name="repeticiones" min="100" max="10000" value="{{ repeticiones }}" required>
                             <small>Número de experimentos</small>
                         </div>
@@ -93,12 +93,12 @@
                             <input type="number" id="repeticiones" name="repeticiones" min="100" max="1000000" value="{{ repeticiones }}" required>
                             <small>Número de experimentos</small>
 
-                            <label for="repeticiones">Parametro miu:</label>
-                            <input type="number" id="miu" name="miu" min="0" max="1000000" value="{{ repeticiones }}" required>
+                            <label for="repeticiones">Parametro μ:</label>
+                            <input type="number" id="miu" name="miu" min="0" max="1000000" step="0.01" value="{{ varianza }}" required>
                             <small>valor de miu </small>
 
-                            <label for="repeticiones">Parametro sigma:</label>
-                            <input type="number" id="sigma" name="sigma" max="1000000" value="{{ repeticiones }}" required>
+                            <label for="repeticiones">Parametro σ:</label>
+                            <input type="number" id="sigma" name="sigma" max="1000000" step="0.01" value="{{ desviacion }}" required>
                             <small>valor de sigma</small>
                         </div>
                         {% endif %}
@@ -145,6 +145,15 @@
                         <p><strong>Porcentaje de soles:</strong> {{ "%.1f"|format((soles/(soles+aguilas))*100) }}%</p>
                         <p><strong>Porcentaje de águilas:</strong> {{ "%.1f"|format((aguilas/(soles+aguilas))*100) }}%</p>
                     </div>
+                </div>
+                {% endif %}
+                {% if datos_descarga is defined %}
+                <div class="info-card">
+                    <h3>💾 Descargar Datos</h3>
+                    <form action="/descargar_datos/{{ distribucion }}" method="POST">
+                        <input type="hidden" name="datos" value="{{ datos_descarga }}">
+                        <button type="submit" class="download-button">⬇️ Descargar TXT</button>
+                    </form>
                 </div>
                 {% endif %}
                 
