@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, send_file
 from io import BytesIO, StringIO
+from flask_cors import CORS
 import os   
 import tempfile
 import base64
@@ -12,6 +13,9 @@ from fuctions import bernuli, exponencial, multinomial, norm, simulacion_binomia
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024 
+CORS(app) # Permitir CORS para todas las rutas
+
+app.config['secret_key']='9f3a8b7c2d1e4f5a6b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2'
 
 @app.route('/')
 def index():

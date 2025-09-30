@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ titulo }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/c2.css') }}">
+    <!-- Cargar MathJax desde un CDN -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
     <div class="main-container">
@@ -25,6 +28,10 @@
                     <form method="POST" class="param-form">
                         
                         {% if distribucion == 'bernoulli' %}
+                        <div class="info-card">
+                            <h3>Fórmula de la distribución Bernoulli</h3>
+                            <p>\[ P(X = x) = \theta^x (1-\theta)^{1-x}, \quad x \in \{0,1\} \]</p>
+                        </div>
                         <div class="input-group">
                             <label for="theta">Probabilidad (θ):</label>
                             <input type="number" id="theta" name="theta" min="0" max="1" step="0.01" value="{{ theta }}" required>
@@ -38,6 +45,10 @@
                         {% endif %}
 
                         {% if distribucion == 'exponencial' %}
+                        <div class="info-card">
+                            <h3>Fórmula de la distribución Exponencial</h3>
+                            <p>\[ f(x; \lambda) = \lambda e^{-\lambda x}, \quad x \geq 0 \]</p>
+                        </div>
                         <div class="input-group">
                             <label for="lambda">Lambda (λ):</label>
                             <input type="number" id="lambda" name="lambda" min="0.1" max="10" step="0.1" value="{{ lmbda }}" required>
@@ -51,13 +62,17 @@
                         {% endif %}
 
                         {% if distribucion == 'multinomial' %}
+                        <div class="info-card">
+                            <h3>Fórmula de la distribución Multinomial</h3>
+                            <p>\[ P(X_1 = x_1, \ldots, X_k = x_k) = \frac{n!}{x_1! \cdots x_k!} \prod_{i=1}^k θ_i^{x_i} \]</p>
+                        </div>
                         <div class="input-group">
                             <label for="n">Numero de simulaciones:</label>
                             <input type="number" id="n" name="n" min="100" max="100000" value="{{ n }}" required>
                             <small>Cantidad de experimentos</small>
                         </div>
                         <div class="input-group">
-                            <label for="caras">Cantidad de intervalos:</label>
+                            <label for="caras">Cantidad de varibles θ:</label>
                             <input type="number" id="caras" name="caras" min="2" max="1000" value="{{ caras }}" required>
                             <small>Caras del dado (2-1000)</small>
                         </div>
@@ -70,6 +85,10 @@
 
 
                         {% if distribucion == 'binomial' %}
+                        <div class="info-card">
+                            <h3>Fórmula de la distribución Binomial</h3>
+                            <p>\[ P(X = k) = \binom{n}{k} \theta^k (1-\theta)^{n-k}, \quad k = 0, 1, \ldots, n \]</p>
+                        </div>
                         <div class="input-group">
                             <label for="theta">Probabilidad (θ):</label>
                             <input type="number" id="theta" name="theta" min="0" max="1" step="0.01" value="{{ theta }}" required>
@@ -88,6 +107,10 @@
                         {% endif %}
 
                         {% if distribucion == 'normal' %}
+                        <div class="info-card">
+                            <h3>Fórmula de la distribución Normal</h3>
+                            <p>\[ f(x; \mu, \sigma) = \frac{1}{\sqrt{2\pi\sigma^2}} e^\left( -\frac{(x-\mu)^2}{2\sigma^2} \right) \]</p>
+                        </div>
                         <div class="input-group">
                             <label for="repeticiones">Repeticiones del Experimento:</label>
                             <input type="number" id="repeticiones" name="repeticiones" min="100" max="10000" value="{{ repeticiones }}" required>
@@ -103,26 +126,6 @@
                         </div>
                         {% endif %}
 
-                        {% if distribucion == 'gebbs' %}
-                        <div class="input-group">
-                            <label for="repeticiones">simulacion de gebbs:</label>
-                            
-                            <label for="repeticiones">x0:</label>
-                            <input type="number" id="x" name="x" min="0" max="10" value="{{ repeticiones }}" required>
-                            <small>valor de miu </small>
-
-                            <label for="repeticiones">y0:</label>
-                            <input type="number" id="y" name="y"min="0" max="10" value="{{ repeticiones }}" required>
-                            <small>valor de sigma</small>
-
-                            <label for="repeticiones">Repeticiones:</label>
-                            <input type="number" id="n" name="n"min="0" max="1100000" value="{{ repeticiones }}" required>
-                            <small>valor de sigma</small>
-                            
-                        </div>
-                        <script src="{{ url_for('static', filename='scripts/3dgrafic.js') }}"></script>
-
-                        {% endif %}
 
                         <button id="formulario" type="submit" class="update-button">🔄 Actualizar Simulacion</button>
                     </form>

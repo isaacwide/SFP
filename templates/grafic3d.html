@@ -32,6 +32,12 @@
                             <input type="number" id="n" name="n" min="100" max="100000" value="1000" required>
                             <small>Cantidad de muestras a generar</small>
                         </div>
+
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
+                            <button type="button" id="ejemplo-btn" class="ejemplo-button">
+                                📝 Probar función de ejemplo: f(x,y) = 2 para x+y≤1, x≥0, y≥0
+                            </button>
+                        </div>
                         {% endif %}
 
                         {% if distribucion == '2normal' %}
@@ -63,12 +69,7 @@
                         {% endif %}
 
                         <button type="submit" class="update-button">🔄 Actualizar Simulacion</button>
-                        
-                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
-                            <button type="button" id="ejemplo-btn" class="ejemplo-button">
-                                📝 Probar función de ejemplo: f(x,y) = 2 para x+y≤1, x≥0, y≥0
-                            </button>
-                        </div>
+                    
                     </form>
                 </div>
 
