@@ -256,12 +256,6 @@ def normal_2():
                          distribucion='2normal')
 
 
-@app.route('/gibbs2', methods=['GET', 'POST'])
-def gibbs2_fuction():
-    return render_template('grafic3d.html',
-                            titulo='Metodo de Gibbs en 2 variables',
-                            distribucion='gibbs2')
-
 
 @app.route('/descargar_datos/<distribucion>', methods=['POST'])
 def descargar_datos(distribucion):
