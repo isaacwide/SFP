@@ -18,6 +18,7 @@
         </header>
 
         <main class="distributions-grid">
+            <!-- 1. Bernoulli -->
             <a href="/bernoulli" class="distribution-card bernoulli">
                 <div class="card-header">
                     <span class="card-icon">🎯</span>
@@ -39,48 +40,7 @@
                 </div>
             </a>
 
-            <a href="/exponencial" class="distribution-card exponencial">
-                <div class="card-header">
-                    <span class="card-icon">⏱</span>
-                    <h2 class="card-title">Distribucion Exponencial</h2>
-                </div>
-                <p class="card-description">
-                    Modela el tiempo entre eventos que ocurren de manera continua 
-                    e independiente a una tasa constante.
-                </p>
-                <div class="card-params">
-                    <div class="param-item">
-                        <span class="param-value">∞</span>
-                        <span class="param-label">Rango</span>
-                    </div>
-                    <div class="param-item">
-                        <span class="param-value">λ</span>
-                        <span class="param-label">Parametro</span>
-                    </div>
-                </div>
-            </a>
-
-            <a href="/multinomial" class="distribution-card multinomial">
-                <div class="card-header">
-                    <span class="card-icon">🎲</span>
-                    <h2 class="card-title">Distribucion Multinomial</h2>
-                </div>
-                <p class="card-description">
-                    Generalizacion de la distribucion binomial para multiples 
-                    categorias. Ideal para dados y eventos con varias opciones.
-                </p>
-                <div class="card-params">
-                    <div class="param-item">
-                        <span class="param-value">N</span>
-                        <span class="param-label">Categorias</span>
-                    </div>
-                    <div class="param-item">
-                        <span class="param-value">p₁...pₖ</span>
-                        <span class="param-label">Probabilidades</span>
-                    </div>
-                </div>
-            </a>
-
+            <!-- 2. Binomial -->
             <a href="/binomial" class="distribution-card binomial">
                 <div class="card-header">
                     <span class="card-icon">🪙</span>
@@ -102,6 +62,51 @@
                 </div>
             </a>
 
+            <!-- 3. Multinomial -->
+            <a href="/multinomial" class="distribution-card multinomial">
+                <div class="card-header">
+                    <span class="card-icon">🎲</span>
+                    <h2 class="card-title">Distribucion Multinomial</h2>
+                </div>
+                <p class="card-description">
+                    Generalizacion de la distribucion binomial para multiples 
+                    categorias. Ideal para dados y eventos con varias opciones.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">N</span>
+                        <span class="param-label">Categorias</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">p₁...pₖ</span>
+                        <span class="param-label">Probabilidades</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 4. Exponencial -->
+            <a href="/exponencial" class="distribution-card exponencial">
+                <div class="card-header">
+                    <span class="card-icon">⏱</span>
+                    <h2 class="card-title">Distribucion Exponencial</h2>
+                </div>
+                <p class="card-description">
+                    Modela el tiempo entre eventos que ocurren de manera continua 
+                    e independiente a una tasa constante.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">∞</span>
+                        <span class="param-label">Rango</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">λ</span>
+                        <span class="param-label">Parametro</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 5. Normal -->
             <a href="/normal" class="distribution-card normal">
                 <div class="card-header">
                     <span class="card-icon">📈</span>
@@ -123,6 +128,7 @@
                 </div>
             </a>
 
+            <!-- 6. Gibbs -->
             <a href="/gebbs" class="distribution-card gebbs">
                 <div class="card-header">
                     <span class="card-icon">🔬</span>
@@ -142,6 +148,8 @@
                     </div>
                 </div>
             </a>
+
+            <!-- 7. Normal Bivariada -->
             <a href="/normal_2" class="distribution-card normal2">
                 <div class="card-header">
                     <span class="card-icon">🔗</span>
@@ -169,4 +177,4 @@
         </main>
     </div>
 </body>
-</html>   
+</html>
