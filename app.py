@@ -176,7 +176,7 @@ def binomial():
     plt.figure()
     fig, ax = plt.subplots()
     ax.hist(histograma, bins=20, edgecolor="black", density=True)
-    ax.set_xlabel("Numero de soles (exitos)")
+    ax.set_xlabel("Numero de exitos")
     ax.set_ylabel("Frecuencia relativa")
     plt.title(f'Distribucion Binomial (θ={theta}, n={lanzamientos}, rep={repeticiones})')
     img = BytesIO()
