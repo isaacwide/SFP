@@ -32,8 +32,9 @@ def bernoulli():
         theta = float(request.form.get('theta', 0.5))
         n = int(request.form.get('n', 10000))
     
-    soles, aguilas, secuencia = bernuli.simBernoulli(theta=theta, n=n)
-    par = [soles, aguilas]
+    exitos, fracaso, secuencia = bernuli.simBernoulli(theta=theta, n=n)
+    par = [exitos, fracaso]
+
 
     # Crear el grafico
     plt.figure()
@@ -54,8 +55,8 @@ def bernoulli():
     
     return render_template('resultado.html', 
                          titulo='Distribucion de Bernoulli',
-                         fracaso=soles, 
-                         exitos=aguilas,
+                         fracaso=fracaso, 
+                         exitos=exitos,
                          imagen=img_str,
                          distribucion='bernoulli',
                          theta=theta,

@@ -55,7 +55,7 @@
                             <small>Parametro de tasa</small>
                         </div>
                         <div class="input-group">
-                            <label for="n">Numero de muestras:</label>
+                            <label for="n">Numero de simulaciones:</label>
                             <input type="number" id="n" name="n" min="50" max="10000" value="{{ n }}" required>
                             <small>Cantidad de valores a generar</small>
                         </div>
@@ -112,9 +112,9 @@
                             <p>\[ f(x; \mu, \sigma) = \frac{1}{\sqrt{2\pi\sigma^2}} e^\left( -\frac{(x-\mu)^2}{2\sigma^2} \right) \]</p>
                         </div>
                         <div class="input-group">
-                            <label for="repeticiones">Repeticiones del Experimento:</label>
+                            <label for="repeticiones">Número de simulaciones:</label>
                             <input type="number" id="repeticiones" name="repeticiones" min="100" max="10000" value="{{ repeticiones }}" required>
-                            <small>Numero de experimentos</small>
+                            <small>Numero de simulaciones</small>
 
                             <label for="repeticiones">Parametro μ:</label>
                             <input type="number" id="miu" name="miu" min="0" max="1000000" step="0.01" value="{{ varianza }}" required>
@@ -131,22 +131,22 @@
                     </form>
                 </div>
                 
-                {% if soles is defined and aguilas is defined %}
+                {% if fracaso is defined and exitos is defined %}
                 <div class="info-card">
                     <h3>📊 Resultados de Simulacion</h3>
                     <div class="stats-grid">
                         <div class="stat-item">
-                            <div class="stat-value">{{ soles }}</div>
-                            <div class="stat-label">Soles</div>
+                            <div class="stat-value">{{ fracaso }}</div>
+                            <div class="stat-label">Fracaso</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-value">{{ aguilas }}</div>
-                            <div class="stat-label">aguilas</div>
+                            <div class="stat-value">{{ exitos }}</div>
+                            <div class="stat-label">Exitos</div>
                         </div>
                     </div>
                     <div class="percentage-info">
-                        <p><strong>Porcentaje de soles:</strong> {{ "%.1f"|format((soles/(soles+aguilas))*100) }}%</p>
-                        <p><strong>Porcentaje de aguilas:</strong> {{ "%.1f"|format((aguilas/(soles+aguilas))*100) }}%</p>
+                        <p><strong>Porcentaje de fracasos:</strong> {{ "%.1f"|format((fracaso/(fracaso+exitos))*100) }}%</p>
+                        <p><strong>Porcentaje de exitos:</strong> {{ "%.1f"|format((exitos/(fracaso +exitos))*100) }}%</p>
                     </div>
                 </div>
                 {% endif %}
