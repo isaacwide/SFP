@@ -33,7 +33,7 @@
                             <p>\[ P(X = x) = \theta^x (1-\theta)^{1-x}, \quad x \in \{0,1\} \]</p>
                         </div>
                         <div class="input-group">
-                            <label for="theta">Probabilidad (θ):</label>
+                            <label for="theta">Probabilidad de éxitos (θ):</label>
                             <input type="number" id="theta" name="theta" min="0" max="1" step="0.01" value="{{ theta }}" required>
                             <small>Probabilidad de exito (0-1)</small>
                         </div>
@@ -90,19 +90,19 @@
                             <p>\[ P(X = k) = \binom{n}{k} \theta^k (1-\theta)^{n-k}, \quad k = 0, 1, \ldots, n \]</p>
                         </div>
                         <div class="input-group">
-                            <label for="theta">Probabilidad (θ):</label>
+                            <label for="theta">Probabilidad de éxitos (θ):</label>
                             <input type="number" id="theta" name="theta" min="0" max="1" step="0.01" value="{{ theta }}" required>
-                            <small>Probabilidad de exito</small>
+                            
                         </div>
                         <div class="input-group">
-                            <label for="lanzamientos">Lanzamientos por experimento:</label>
+                            <label for="lanzamientos">Número de ensayos:</label>
                             <input type="number" id="lanzamientos" name="lanzamientos" min="1" max="100" value="{{ lanzamientos }}" required>
                             <small>Numero de intentos por simulacion</small>
                         </div>
                         <div class="input-group">
-                            <label for="repeticiones">N repeticiones:</label>
+                            <label for="repeticiones">N simulaciones:</label>
                             <input type="number" id="repeticiones" name="repeticiones" min="100" max="10000" value="{{ repeticiones }}" required>
-                            <small>Numero de experimentos</small>
+                            <small>Numero de simulaciones</small>
                         </div>
                         {% endif %}
 
