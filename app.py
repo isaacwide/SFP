@@ -24,12 +24,12 @@ def index():
 @app.route('/bernoulli', methods=['GET', 'POST'])
 def bernoulli():
     # Valores por defecto
-    theta = 0.3
+    theta = 0.5
     n = 10000
     
     # valores del usuario
     if request.method == 'POST':
-        theta = float(request.form.get('theta', 0.3))
+        theta = float(request.form.get('theta', 0.5))
         n = int(request.form.get('n', 10000))
     
     soles, aguilas, secuencia = bernuli.simBernoulli(theta=theta, n=n)
@@ -40,7 +40,7 @@ def bernoulli():
     fig, ax = plt.subplots()
     ax.bar(x=range(len(par)), height=par)
     ax.set_xticks([0, 1])
-    ax.set_xticklabels(['Soles', 'aguilas'])
+    ax.set_xticklabels(['Fracaso', 'Exitos'])
     plt.title(f'Distribucion de Bernoulli (θ={theta}, n={n})')      
     img = BytesIO()
     plt.savefig(img, format='png')
@@ -50,12 +50,12 @@ def bernoulli():
     img_str = base64.b64encode(img.getvalue()).decode('ascii')
     
     # Crear datos para descarga
-    datos_descarga = "\n".join([f"Experimento {i+1}: {'Sol' if x == 1 else 'aguila'}" for i, x in enumerate(secuencia)])
+    datos_descarga = "\n".join([f"Experimento {i+1}: {'fracaso' if x == 1 else 'exito'}" for i, x in enumerate(secuencia)])
     
     return render_template('resultado.html', 
                          titulo='Distribucion de Bernoulli',
-                         soles=soles, 
-                         aguilas=aguilas,
+                         fracaso=soles, 
+                         exitos=aguilas,
                          imagen=img_str,
                          distribucion='bernoulli',
                          theta=theta,
