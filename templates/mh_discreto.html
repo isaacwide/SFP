@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metropolis-Hastings Discreto</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/c2.css') }}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header h1 {
+            color: #2d3748;
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+        }
+        
+        .header p {
+            color: #718096;
+            margin: 0;
+            font-size: 1.1em;
+        }
+        
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .left-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            height: fit-content;
+        }
+        
+        .right-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .info-card h3 {
+            color: #2d3748;
+            margin: 0 0 20px 0;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .distribution-selector {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .distribution-selector label {
+            color: white;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 12px;
+            font-size: 1.05em;
+        }
+        
+        .distribution-selector select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: none;
+            background: white;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .distribution-selector select:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .input-group small {
+            display: block;
+            color: #718096;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .params-container {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .params-container.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        .params-container h3 {
+            color: #667eea;
+            font-size: 1.1em;
+            margin: 0 0 15px 0;
+        }
+        
+        .formula-box {
+            background: linear-gradient(135deg, #e8f4f8 0%, #f0e8f8 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .formula-box strong {
+            color: #2d3748;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, #e8f4f8 0%, #f0e8f8 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .info-box p {
+            margin: 5px 0;
+            color: #2d3748;
+            font-size: 0.95em;
+        }
+        
+        .update-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            margin-top: 25px;
+        }
+        
+        .update-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+        
+        .results-container {
+            margin-top: 30px;
+        }
+        
+        .results-header {
+            color: #2d3748;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        
+        .chart-info {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .chart-info p {
+            margin: 5px 0;
+            color: #4a5568;
+            font-size: 0.95em;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .chart-container img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        
+        .download-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);
+            margin-top: 20px;
+        }
+        
+        .download-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
+        }
+        
+        .navigation {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .back-button {
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            background: white;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <h1>Metropolis-Hastings - Caso Discreto</h1>
+            <p>Genera muestras de distribuciones discretas usando cadenas de Markov</p>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="left-panel">
+                <div class="info-card">
+                    <h3>⚙️ Parámetros de Simulación</h3>
+                    
+                    <form method="POST">
+                        <!-- Selector de distribución -->
+                        <div class="distribution-selector">
+                            <label for="tipo_distribucion">Distribución objetivo (π):</label>
+                            <select id="tipo_distribucion" name="tipo_distribucion" onchange="cambiarDistribucion()" required>
+                                <option value="poisson" {% if tipo_distribucion == 'poisson' %}selected{% endif %}>Poisson</option>
+                                <option value="uniforme" {% if tipo_distribucion == 'uniforme' %}selected{% endif %}>Uniforme Discreta</option>
+                                <option value="geometrica" {% if tipo_distribucion == 'geometrica' %}selected{% endif %}>Geométrica</option>
+                            </select>
+                        </div>
+
+                        <!-- Parámetros generales -->
+                        <div class="input-group">
+                            <label for="n_iteraciones">Número de iteraciones (n):</label>
+                            <input type="number" id="n_iteraciones" name="n_iteraciones" 
+                                   value="{{ n_iteraciones if n_iteraciones else 10000 }}" 
+                                   min="100" max="100000" step="100" required>
+                            <small>Cantidad de muestras a generar</small>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="n_estados">Número de estados:</label>
+                            <input type="number" id="n_estados" name="n_estados" 
+                                   value="{{ n_estados if n_estados else 10 }}" 
+                                   min="2" max="50" required>
+                            <small>Tamaño del espacio de estados</small>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="x0">Estado inicial (x₀):</label>
+                            <input type="number" id="x0" name="x0" 
+                                   value="{{ x0 if x0 and x0 != 'Aleatorio' else '' }}" 
+                                   min="0" placeholder="Aleatorio si se deja vacío">
+                            <small>Estado inicial de la cadena (opcional)</small>
+                        </div>
+
+                        <!-- Parámetros específicos por distribución -->
+                        <div id="params-poisson" class="params-container">
+                            <h3>📊 Distribución Poisson</h3>
+                            <div class="input-group">
+                                <label for="lambda_poisson">Tasa promedio (λ):</label>
+                                <input type="number" id="lambda_poisson" name="lambda_poisson" 
+                                       value="3" min="0.1" step="0.1">
+                                <small>Número promedio de eventos</small>
+                            </div>
+                            <div class="formula-box">
+                                <strong>Fórmula:</strong> P(X=k) = (e<sup>-λ</sup> × λ<sup>k</sup>) / k!
+                            </div>
+                        </div>
+
+                        <div id="params-uniforme" class="params-container">
+                            <h3>📊 Distribución Uniforme Discreta</h3>
+                            <div class="info-box">
+                                <p><strong>Descripción:</strong> Todos los estados tienen igual probabilidad</p>
+                                <p><strong>Fórmula:</strong> P(X=k) = 1/n para todo k</p>
+                                <p style="font-style: italic; margin-top: 10px;">No requiere parámetros adicionales</p>
+                            </div>
+                        </div>
+
+                        <div id="params-geometrica" class="params-container">
+                            <h3>📊 Distribución Geométrica</h3>
+                            <div class="input-group">
+                                <label for="p_geometrica">Probabilidad de éxito (p):</label>
+                                <input type="number" id="p_geometrica" name="p_geometrica" 
+                                       value="0.3" min="0.01" max="0.99" step="0.01">
+                                <small>Valor entre 0 y 1</small>
+                            </div>
+                            <div class="formula-box">
+                                <strong>Fórmula:</strong> P(X=k) = p × (1-p)<sup>k</sup>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="update-button">🔄 Actualizar Simulación</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                {% if imagen %}
+                <div class="results-container">
+                    <h2 class="results-header">Resultados de la Simulación</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Tasa de aceptación</div>
+                            <div class="stat-value">{{ "%.1f"|format(acceptance_rate) }}%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Iteraciones</div>
+                            <div class="stat-value">{{ n_iteraciones }}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Estados</div>
+                            <div class="stat-value">{{ n_estados }}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Estado inicial</div>
+                            <div class="stat-value">{{ x0 }}</div>
+                        </div>
+                    </div>
+
+                    <div class="chart-info">
+                        <p><strong>Superior izquierda:</strong> Traza de la Cadena de Markov</p>
+                        <p><strong>Superior derecha:</strong> Comparación distribuciones (objetivo vs empírica)</p>
+                        <p><strong>Inferior izquierda:</strong> Convergencia de la media</p>
+                        <p><strong>Inferior derecha:</strong> Función de autocorrelación</p>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <img src="data:image/png;base64,{{ imagen }}" alt="Gráficos de diagnóstico">
+                    </div>
+
+                    <form method="POST" action="{{ url_for('descargar_datos', distribucion='mh_discreto') }}">
+                        <input type="hidden" name="datos" value="{{ datos_descarga }}">
+                        <button type="submit" class="download-button">📥 Descargar datos CSV</button>
+                    </form>
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 100px 20px; color: #718096;">
+                    <h2 style="font-size: 2em; margin-bottom: 10px;">👈 Configura los parámetros</h2>
+                    <p style="font-size: 1.1em;">Selecciona una distribución y haz clic en "Actualizar Simulación"</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="/metropolis_hastings" class="back-button">← Volver a M-H</a>
+            <a href="/" class="back-button">🏠 Inicio</a>
+        </div>
+    </div>
+
+    <script>
+        function cambiarDistribucion() {
+            const dist = document.getElementById('tipo_distribucion').value;
+            const containers = document.querySelectorAll('.params-container');
+            
+            containers.forEach(container => {
+                container.classList.remove('active');
+            });
+            
+            document.getElementById('params-' + dist).classList.add('active');
+        }
+        
+        window.onload = function() {
+            cambiarDistribucion();
+        };
+    </script>
+</body>
+</html>

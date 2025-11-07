@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metropolis-Hastings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/c1.css') }}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .title {
+            color: white;
+            font-size: 3em;
+            margin: 0 0 15px 0;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.5em;
+            margin: 0 0 10px 0;
+            font-weight: 500;
+        }
+        
+        .description {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1.1em;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .distributions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .distribution-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 35px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .distribution-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .distribution-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .card-icon {
+            font-size: 2.5em;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+        
+        .card-title {
+            color: #2d3748;
+            margin: 0;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+        
+        .card-description {
+            color: #4a5568;
+            line-height: 1.7;
+            font-size: 1.05em;
+            margin-bottom: 25px;
+        }
+        
+        .card-params {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .param-item {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .param-value {
+            display: block;
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .param-label {
+            display: block;
+            font-size: 0.9em;
+            color: #718096;
+            font-weight: 600;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        .back-link a {
+            display: inline-block;
+            padding: 15px 40px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .back-link a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            background: white;
+        }
+        
+        .mcmc-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-top: 15px;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2em;
+            }
+            
+            .distributions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-params {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">Algoritmo Metropolis-Hastings</h1>
+            <p class="subtitle">Selecciona el tipo de implementación</p>
+            <p class="description">
+                El algoritmo Metropolis-Hastings es un método MCMC (Markov Chain Monte Carlo) 
+                que permite generar muestras de distribuciones de probabilidad complejas mediante 
+                una cadena de Markov. Elige entre el caso continuo o discreto según tu necesidad.
+            </p>
+        </header>
+
+        <main class="distributions-grid">
+            <!-- Caso Continuo -->
+            <a href="/metropolis_hastings/continuo" class="distribution-card">
+                <div class="card-header">
+                    <span class="card-icon">📊</span>
+                    <h2 class="card-title">Caso Continuo</h2>
+                </div>
+                <p class="card-description">
+                    Implementación del algoritmo M-H para distribuciones continuas.
+                    Ideal para muestrear de distribuciones normales, exponenciales, uniformes 
+                    y gamma cuando el muestreo directo es difícil o imposible.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">4</span>
+                        <span class="param-label">Distribuciones</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">∞</span>
+                        <span class="param-label">Rango</span>
+                    </div>
+                </div>
+                <span class="mcmc-badge">Normal • Exponencial • Uniforme • Gamma</span>
+            </a>
+
+            <!-- Caso Discreto -->
+            <a href="/metropolis_hastings/discreto" class="distribution-card">
+                <div class="card-header">
+                    <span class="card-icon">🎯</span>
+                    <h2 class="card-title">Caso Discreto</h2>
+                </div>
+                <p class="card-description">
+                    Implementación del algoritmo M-H para distribuciones discretas usando 
+                    cadenas de Markov con matriz de transición simétrica. 
+                    Perfecto para muestrear de distribuciones con estados finitos.
+                </p>
+                <div class="card-params">
+                    <div class="param-item">
+                        <span class="param-value">3</span>
+                        <span class="param-label">Distribuciones</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-value">N</span>
+                        <span class="param-label">Estados finitos</span>
+                    </div>
+                </div>
+                <span class="mcmc-badge">Poisson • Uniforme • Geométrica</span>
+            </a>
+        </main>
+
+        <div class="back-link">
+            <a href="/">← Volver al inicio</a>
+        </div>
+    </div>
+</body>
+</html>

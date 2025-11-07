@@ -6,14 +6,16 @@ import tempfile
 import base64
 import random
 import math
+import numpy as np
+from math import factorial
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from fuctions import bernuli, exponencial, multinomial, norm, simulacion_binomial
+from fuctions import bernuli, exponencial, multinomial, norm, simulacion_binomial, metropolis_hastings
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024 
-CORS(app) # Permitir CORS para todas las rutas
+CORS(app)
 
 app.config['secret_key']='9f3a8b7c2d1e4f5a6b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2'
 
@@ -23,11 +25,9 @@ def index():
 
 @app.route('/bernoulli', methods=['GET', 'POST'])
 def bernoulli():
-    # Valores por defecto
     theta = 0.5
     n = 10000
     
-    # valores del usuario
     if request.method == 'POST':
         theta = float(request.form.get('theta', 0.5))
         n = int(request.form.get('n', 10000))
@@ -35,8 +35,7 @@ def bernoulli():
     exitos, fracaso, secuencia = bernuli.simBernoulli(theta=theta, n=n)
     par = [exitos, fracaso]
 
-
-    # Crear el grafico
+# Crear el grafico
     plt.figure()
     fig, ax = plt.subplots()
     ax.bar(x=range(len(par)), height=par)
@@ -48,9 +47,8 @@ def bernoulli():
     img.seek(0)
     plt.close()
             
+    # Crear datos para descarga        
     img_str = base64.b64encode(img.getvalue()).decode('ascii')
-    
-    # Crear datos para descarga
     datos_descarga = "\n".join([f"Experimento {i+1}: {'fracaso' if x == 1 else 'exito'}" for i, x in enumerate(secuencia)])
     
     return render_template('resultado.html', 
@@ -65,18 +63,15 @@ def bernoulli():
 
 @app.route('/exponencial', methods=['GET', 'POST'])
 def exponential():
-    # Valores por defecto
     lmbda = 0.5
     n = 100
     
-    # valores del usuario
     if request.method == 'POST':
         lmbda = float(request.form.get('lambda', 0.5))
         n = int(request.form.get('n', 100))
     
     valores = exponencial.simExponencial(lmbda=lmbda, n=n)
 
-    # Generar la imagen 
     plt.figure()
     fig, ax = plt.subplots()
     ax.hist(valores, bins=20, edgecolor='black', density=True)  
@@ -89,7 +84,6 @@ def exponential():
     plt.close()
     img_str = base64.b64encode(img.getvalue()).decode('ascii')
 
-    # Crear datos para descarga
     datos_descarga = "\n".join([f"Muestra {i+1}: {x}" for i, x in enumerate(valores)])
 
     return render_template('resultado.html',
@@ -114,7 +108,6 @@ def multi():
         uniforme = request.form.get('uniforme') == '1'
 
     histograma, secuencia, probabilidades = multinomial.simMultinomial(n=n, rangos=caras, uniforme=uniforme)
-    
     # Generar la imagen del histograma
     plt.figure()
     fig, ax = plt.subplots()
@@ -137,7 +130,6 @@ def multi():
         if i < len(probabilidades) - 1:
             datos_probabilidades += ", "
     
-
     max_lanzamientos = 10000
     if len(secuencia) > max_lanzamientos:
         secuencia_reducida = secuencia[:max_lanzamientos]
@@ -172,7 +164,6 @@ def binomial():
         repeticiones = int(request.form.get('repeticiones', 1000))
     
     histograma, promedio, secuencia = simulacion_binomial.simBinomial(theta=theta, lanzamientos=lanzamientos, repeticiones=repeticiones)
-    
     # Crear el grafico
     plt.figure()
     fig, ax = plt.subplots()
@@ -231,7 +222,6 @@ def normal():
     plt.close() 
 
     img_str = base64.b64encode(img.getvalue()).decode('ascii')
-
     # Crear datos para descarga
     datos_descarga = "\n".join([f"Muestra {i+1}: {x}" for i, x in enumerate(valores)])
 
@@ -244,8 +234,7 @@ def normal():
                          datos_descarga=datos_descarga,
                          repeticiones=repeticiones,
                          varianza=miu,
-                         desviacion=sigma,
-                         )
+                         desviacion=sigma)
 
 @app.route('/gebbs', methods=['GET', 'POST'])
 def gebbs_method():
@@ -253,14 +242,209 @@ def gebbs_method():
                          titulo='Metodo de Gibbs',
                          distribucion='gebbs')
 
-
 @app.route('/normal_2', methods=['GET', 'POST'])
 def normal_2():
     return render_template('grafic3d.html',
                          titulo='Normal en 2 variables',
                          distribucion='2normal')
 
+@app.route('/metropolis_hastings')
+def metropolis_hastings_menu():
+    return render_template('metropolis_hastings.html')
 
+@app.route('/metropolis_hastings/continuo', methods=['GET', 'POST'])
+def mh_continuo():
+    # Valores por defecto
+    n_samples = 1000
+    initial_value = 0
+    distribucion = 'normal'
+    proposal_std = 1
+    
+    # Parámetros específicos por distribución
+    params = {
+        'normal': {'mu': 0, 'sigma': 1},
+        'exponencial': {'lambda': 1},
+        'uniforme': {'a': 0, 'b': 1},
+        'gamma': {'alpha': 2, 'beta': 1}
+    }
+    
+    if request.method == 'POST':
+        n_samples = int(request.form.get('n_samples', 1000))
+        initial_value = float(request.form.get('initial_value', 0))
+        distribucion = request.form.get('distribucion', 'normal')
+        proposal_std = float(request.form.get('proposal_std', 1))
+        
+        # Obtener parámetros según distribución
+        if distribucion == 'normal':
+            params['normal']['mu'] = float(request.form.get('mu', 0))
+            params['normal']['sigma'] = float(request.form.get('sigma', 1))
+            dist_params = params['normal']
+        elif distribucion == 'exponencial':
+            params['exponencial']['lambda'] = float(request.form.get('lambda', 1))
+            dist_params = params['exponencial']
+        elif distribucion == 'uniforme':
+            params['uniforme']['a'] = float(request.form.get('a', 0))
+            params['uniforme']['b'] = float(request.form.get('b', 1))
+            dist_params = params['uniforme']
+        elif distribucion == 'gamma':
+            params['gamma']['alpha'] = float(request.form.get('alpha', 2))
+            params['gamma']['beta'] = float(request.form.get('beta', 1))
+            dist_params = params['gamma']
+
+            # Generar muestras
+        
+        samples, acceptance_rate = metropolis_hastings.mh_continuo(
+            n_samples, initial_value, distribucion, dist_params, proposal_std
+        )
+        # Calcular estadísticas
+        stats = metropolis_hastings.calcular_estadisticas(samples, burn_in=min(1000, n_samples//10))
+        
+        # Crear gráfico
+        fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+        
+        # 1. Histograma
+        axes[0, 0].hist(samples, bins=50, edgecolor='black', density=True, alpha=0.7)
+        axes[0, 0].set_xlabel('Valores')
+        axes[0, 0].set_ylabel('Densidad')
+        axes[0, 0].set_title(f'Distribución de muestras - {distribucion.capitalize()}')
+        axes[0, 0].grid(True, alpha=0.3)
+        
+        # 2. Traza de la cadena
+        axes[0, 1].plot(samples[:min(1000, len(samples))], linewidth=0.8)
+        axes[0, 1].set_xlabel('Iteración')
+        axes[0, 1].set_ylabel('Valor')
+        axes[0, 1].set_title(f'Traza de la cadena (primeras {min(1000, len(samples))} iteraciones)')
+        axes[0, 1].grid(True, alpha=0.3)
+        
+        # 3. Convergencia de la media
+        medias_acumuladas = np.cumsum(samples) / np.arange(1, len(samples) + 1)
+        axes[1, 0].plot(medias_acumuladas)
+        axes[1, 0].axhline(y=stats['media'], color='r', linestyle='--', 
+                          label=f'Media final = {stats["media"]:.3f}')
+        axes[1, 0].set_xlabel('Iteración')
+        axes[1, 0].set_ylabel('Media acumulada')
+        axes[1, 0].set_title('Convergencia de la Media')
+        axes[1, 0].legend()
+        axes[1, 0].grid(True, alpha=0.3)
+        
+        # 4. Autocorrelación
+        autocorr = metropolis_hastings.calcular_autocorrelacion(samples, max_lag=min(100, len(samples)//10))
+        axes[1, 1].plot(autocorr)
+        axes[1, 1].set_xlabel('Lag')
+        axes[1, 1].set_ylabel('Autocorrelación')
+        axes[1, 1].set_title('Función de Autocorrelación')
+        axes[1, 1].grid(True, alpha=0.3)
+        
+        plt.tight_layout()
+        img = BytesIO()
+        plt.savefig(img, format='png', dpi=100)
+        img.seek(0)
+        plt.close()
+        
+        img_str = base64.b64encode(img.getvalue()).decode('ascii')
+        
+        # Datos para descarga
+        datos_descarga = f"Estadísticas:\nMedia: {stats['media']:.6f}\nMediana: {stats['mediana']:.6f}\nDesviación: {stats['desviacion']:.6f}\n\nMuestras:\n"
+        datos_descarga += "\n".join([f"Muestra {i+1}: {x:.6f}" for i, x in enumerate(samples)])
+        
+        return render_template('mh_continuo.html',
+                             imagen=img_str,
+                             acceptance_rate=acceptance_rate,
+                             n_samples=n_samples,
+                             initial_value=initial_value,
+                             distribucion=distribucion,
+                             params=dist_params,
+                             proposal_std=proposal_std,
+                             stats=stats,
+                             datos_descarga=datos_descarga)
+    
+    return render_template('mh_continuo.html',
+                         distribucion='normal',
+                         params=params['normal'])
+
+@app.route('/metropolis_hastings/discreto', methods=['GET', 'POST'])
+def mh_discreto():
+    n_iteraciones = 10000
+    n_estados = 10
+    x0 = None
+    tipo_distribucion = 'poisson'
+    
+    if request.method == 'POST':
+        n_iteraciones = int(request.form.get('n_iteraciones', 10000))
+        n_estados = int(request.form.get('n_estados', 10))
+        x0_input = request.form.get('x0', '')
+        x0 = int(x0_input) if x0_input else None
+        tipo_distribucion = request.form.get('tipo_distribucion', 'poisson')
+        
+        if tipo_distribucion == 'poisson':
+            lambda_param = float(request.form.get('lambda_poisson', 3))
+            estados = np.arange(0, n_estados)
+            pi = np.exp(-lambda_param) * (lambda_param ** estados) / np.array([factorial(k) for k in estados])
+            pi = pi / pi.sum()
+            param_info = f"λ={lambda_param}"
+        elif tipo_distribucion == 'uniforme':
+            pi = np.ones(n_estados) / n_estados
+            param_info = "Uniforme"
+        elif tipo_distribucion == 'geometrica':
+            p = float(request.form.get('p_geometrica', 0.3))
+            estados = np.arange(0, n_estados)
+            pi = p * ((1-p) ** estados)
+            pi = pi / pi.sum()
+            param_info = f"p={p}"
+        else:
+            pi = np.ones(n_estados) / n_estados
+            param_info = "Uniforme"
+        
+         # Crear matriz de propuesta
+        Q = metropolis_hastings.crear_matriz_propuesta_simetrica(n_estados)
+
+         # Ejecutar Metropolis-Hastings
+        cadena, tasa_aceptacion = metropolis_hastings.metropolis_hastings_discreto(pi, Q, n_iteraciones, x0)
+        
+        # Usar la función de visualización original
+        burn_in = 1000
+        fig = metropolis_hastings.visualizar_resultados(cadena, pi, burn_in)
+        
+         # Guardar imagen
+        img = BytesIO()
+        plt.savefig(img, format='png', dpi=100)
+        img.seek(0)
+        plt.close()
+        
+        img_str = base64.b64encode(img.getvalue()).decode('ascii')
+        
+        # Calcular distribución empírica
+        frecuencias = np.bincount(cadena[burn_in:], minlength=n_estados)
+        dist_empirica = frecuencias / frecuencias.sum()
+        
+        # Datos para descarga
+        datos_probs = f"Distribución: {tipo_distribucion.capitalize()} ({param_info})\n"
+        datos_probs += f"Número de iteraciones: {n_iteraciones}\n"
+        datos_probs += f"Tasa de aceptación: {tasa_aceptacion:.3f}\n\n"
+        datos_probs += "Comparación de distribuciones (después del burn-in):\n"
+        datos_probs += "Estado | Objetivo | Empírica | Diferencia\n"
+        datos_probs += "-" * 50 + "\n"
+        for i in range(n_estados):
+            diff = abs(pi[i] - dist_empirica[i])
+            datos_probs += f"  {i:2d}   |  {pi[i]:.4f}  |  {dist_empirica[i]:.4f}  |  {diff:.4f}\n"
+        
+        mse = np.mean((pi - dist_empirica)**2)
+        datos_probs += f"\nError cuadrático medio: {mse:.6f}\n"
+        
+        datos_samples = f"\n\nMuestras (primeras 10000):\n"
+        datos_samples += "\n".join([f"Muestra {i+1}: Estado {s}" for i, s in enumerate(cadena[:10000])])
+        datos_descarga = datos_probs + datos_samples
+        
+        return render_template('mh_discreto.html',
+                             imagen=img_str,
+                             acceptance_rate=tasa_aceptacion * 100,
+                             n_iteraciones=n_iteraciones,
+                             n_estados=n_estados,
+                             x0=x0 if x0 is not None else 'Aleatorio',
+                             tipo_distribucion=tipo_distribucion,
+                             datos_descarga=datos_descarga)
+    
+    return render_template('mh_discreto.html')
 
 @app.route('/descargar_datos/<distribucion>', methods=['POST'])
 def descargar_datos(distribucion):
@@ -284,7 +468,7 @@ def descargar_datos(distribucion):
                         partes = linea.split(': ')
                         csv_datos += f"{partes[0].replace('Experimento ', '')},{partes[1]}\n"
                     except IndexError:
-                        continue  # Saltar lineas mal formateadas
+                        continue
         
         elif distribucion == 'exponencial':
             lineas = datos.split('\n')
@@ -298,23 +482,23 @@ def descargar_datos(distribucion):
                         continue
         
         elif distribucion == 'multinomial':
-            # Hacer el procesamiento mas robusto
+             # Hacer el procesamiento mas robusto
             partes = datos.split('\n\n')
             
-            # Verificar que tenemos al menos una parte
+             # Verificar que tenemos al menos una parte
             if len(partes) == 0:
                 return "Formato de datos invalido", 400
                 
             csv_datos = ""
             
-            # Procesar probabilidades si existen
+             # Procesar probabilidades si existen
             if len(partes) > 0 and 'Probabilidades:' in partes[0]:
                 prob_lineas = partes[0].split('\n')
-                if len(prob_lineas) > 1:  # Si hay mas de una linea (encabezado + datos)
+                if len(prob_lineas) > 1:
                     csv_datos += "Cara,Probabilidad\n"
                     # Procesar todas las lineas despues del encabezado
                     for linea in prob_lineas[1:]:
-                        if linea.strip():  # Si la linea no esta vacia
+                        if linea.strip():# Si la linea no esta vacia
                             # Dividir por comas para obtener cada par cara-probabilidad
                             elementos = linea.split(', ')
                             for elemento in elementos:
@@ -364,12 +548,41 @@ def descargar_datos(distribucion):
                         csv_datos += f"{partes[0].replace('Muestra ', '')},{partes[1]}\n"
                     except IndexError:
                         continue
+                    
+        elif distribucion == 'mh_continuo':
+            lineas = datos.split('\n')
+            csv_datos = ""
+            
+            # Buscar estadísticas
+            for i, linea in enumerate(lineas):
+                if linea.startswith('Estadísticas:'):
+                    csv_datos += "Estadística,Valor\n"
+                    for j in range(i+1, min(i+5, len(lineas))):
+                        if ': ' in lineas[j]:
+                            partes = lineas[j].split(': ')
+                            csv_datos += f"{partes[0]},{partes[1]}\n"
+                    csv_datos += "\nMuestra,Valor\n"
+                    break
+            
+            # Procesar muestras
+            for linea in lineas:
+                if linea.startswith('Muestra '):
+                    try:
+                        partes = linea.split(': ')
+                        num = partes[0].replace('Muestra ', '')
+                        valor = partes[1]
+                        csv_datos += f"{num},{valor}\n"
+                    except IndexError:
+                        continue
+
+        elif distribucion == 'mh_discreto':
+            csv_datos = datos.replace('  ', ',').replace(' | ', ',')
         
         else:
-            # Para distribuciones no especificadas, usar formato simple
             csv_datos = "Datos\n" + datos.replace('\n', '\n')
         
-        # Si no se generaron datos CSV, crear un formato basico
+         # Si no se generaron datos CSV, crear un formato basico
+
         if not csv_datos.strip():
             csv_datos = "Datos\n" + datos.replace('\n', '\n')
         
