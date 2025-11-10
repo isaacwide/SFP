@@ -124,6 +124,24 @@ def visualizar_resultados(cadena, pi, burn_in=1000):
 
 
 # CASO CONTINUO - Distribuciones hasta Gamma donde Isaac me dijo Bv
+def normal_parametros(x,mu,sigma):
+     # Validación
+    if sigma <= 0:
+        raise ValueError("Sigma debe ser mayor que 0")
+    
+    # Convertir a array si es necesario
+    x = np.asarray(x)
+    
+    # Constante de normalización
+    coeficiente = 1.0 / (sigma * np.sqrt(2 * np.pi))
+    
+    # Exponente
+    exponente = -((x - mu) ** 2) / (2 * sigma ** 2)
+    
+    # Densidad
+    densidad = coeficiente * np.exp(exponente)
+    
+    return densidad
 
 def normal_pdf(x, mu, sigma):
     """Función de densidad Normal"""
@@ -153,6 +171,10 @@ def gamma_pdf(x, alpha, beta):
         return 0
     return (beta ** alpha / gamma_func(alpha)) * (x ** (alpha - 1)) * math.exp(-beta * x)
 
+def SumaNormal_pdf(x,mu1,sigma1,mu2,sigma2,peso):
+
+    return peso * normal_parametros(x,mu1,sigma1) + (1-peso)*normal_parametros(x,mu2,sigma2)
+    
 
 def mh_continuo(n_samples, initial_value, distribucion, params, proposal_std):
     """
@@ -182,6 +204,8 @@ def mh_continuo(n_samples, initial_value, distribucion, params, proposal_std):
         target_pdf = lambda x: uniforme_pdf(x, params['a'], params['b'])
     elif distribucion == 'gamma':
         target_pdf = lambda x: gamma_pdf(x, params['alpha'], params['beta'])
+    elif distribucion == "SumaNormal":
+        target_pdf =lambda x:SumaNormal_pdf(x,params['mu1'],params['sigma1'],params['mu2'],params['sigma2'],params['peso'])
     else:
         raise ValueError(f"Distribución '{distribucion}' no soportada")
     
@@ -213,6 +237,7 @@ def mh_continuo(n_samples, initial_value, distribucion, params, proposal_std):
 # Funciones auxiliares
 
 def calcular_estadisticas(samples, burn_in=1000):
+
     """Calcula estadísticas básicas de las muestras"""
     samples_filtradas = samples[burn_in:]
     return {

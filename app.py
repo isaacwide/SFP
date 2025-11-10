@@ -265,31 +265,41 @@ def mh_continuo():
         'normal': {'mu': 0, 'sigma': 1},
         'exponencial': {'lambda': 1},
         'uniforme': {'a': 0, 'b': 1},
-        'gamma': {'alpha': 2, 'beta': 1}
+        'gamma': {'alpha': 2, 'beta': 1},
+        "SumaNormal":{'mu1':-2,'sigma1':1,'mu2':2,'sigma2':1,'peso':0.5}
     }
     
     if request.method == 'POST':
-        n_samples = int(request.form.get('n_samples', 1000))
-        initial_value = float(request.form.get('initial_value', 0))
+        n_samples = int(request.form.get('n_samples' or 1000))
+        initial_value = float(request.form.get('initial_value'or 0))
         distribucion = request.form.get('distribucion', 'normal')
-        proposal_std = float(request.form.get('proposal_std', 1))
+        proposal_std = float(request.form.get('proposal_std'or 1))
         
         # Obtener parámetros según distribución
         if distribucion == 'normal':
-            params['normal']['mu'] = float(request.form.get('mu', 0))
-            params['normal']['sigma'] = float(request.form.get('sigma', 1))
+            params['normal']['mu'] = float(request.form.get('mu'or 0))
+            params['normal']['sigma'] = float(request.form.get('sigma'or 1))
             dist_params = params['normal']
         elif distribucion == 'exponencial':
-            params['exponencial']['lambda'] = float(request.form.get('lambda', 1))
+            params['exponencial']['lambda'] = float(request.form.get('lambda'or 1))
             dist_params = params['exponencial']
         elif distribucion == 'uniforme':
-            params['uniforme']['a'] = float(request.form.get('a', 0))
-            params['uniforme']['b'] = float(request.form.get('b', 1))
+            params['uniforme']['a'] = float(request.form.get('a'or 0))
+            params['uniforme']['b'] = float(request.form.get('b'or 1))
             dist_params = params['uniforme']
         elif distribucion == 'gamma':
-            params['gamma']['alpha'] = float(request.form.get('alpha', 2))
-            params['gamma']['beta'] = float(request.form.get('beta', 1))
+            params['gamma']['alpha'] = float(request.form.get('alpha'or 2))
+            params['gamma']['beta'] = float(request.form.get('beta'or 1))
             dist_params = params['gamma']
+        elif distribucion == 'SumaNormal':
+            
+            params['SumaNormal']['mu1'] = float(request.form.get('mu1' or -2))
+            params['SumaNormal']['sigma1'] = float(request.form.get('sigma1' or 1))
+            params['SumaNormal']['mu2'] = float(request.form.get('mu2' or 2))
+            params['SumaNormal']['sigma2']= float(request.form.get('sigma2' or 1))
+            params['SumaNormal']['peso'] = float(request.form.get('peso' or 0.5))
+            dist_params = params['SumaNormal']
+            
 
             # Generar muestras
         

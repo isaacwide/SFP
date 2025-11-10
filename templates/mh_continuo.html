@@ -340,6 +340,7 @@
                                 <option value="exponencial" {% if distribucion == 'exponencial' %}selected{% endif %}>Exponencial</option>
                                 <option value="uniforme" {% if distribucion == 'uniforme' %}selected{% endif %}>Uniforme Continua</option>
                                 <option value="gamma" {% if distribucion == 'gamma' %}selected{% endif %}>Gamma</option>
+                                <option value="SumaNormal" {% if distribucion == 'SumaNormal' %}selected{% endif %}>SumaNormal</option>
                             </select>
                         </div>
 
@@ -369,75 +370,114 @@
                         </div>
 
                         <!-- Parámetros específicos por distribución -->
-                        <div id="params-normal" class="params-container">
-                            <h3>📈 Distribución Normal</h3>
-                            <div class="input-group">
-                                <label for="mu">Media (μ):</label>
-                                <input type="number" id="mu" name="mu" 
-                                       value="{{ params.mu if params else 0 }}" 
-                                       step="0.1">
-                            </div>
-                            <div class="input-group">
-                                <label for="sigma">Desviación estándar (σ):</label>
-                                <input type="number" id="sigma" name="sigma" 
-                                       value="{{ params.sigma if params else 1 }}" 
-                                       min="0.01" step="0.1">
-                            </div>
-                            <div class="formula-box">
-                                <strong>Fórmula:</strong> f(x) = (1/σ√2π) × e<sup>-(x-μ)²/2σ²</sup>
-                            </div>
+                    <div id="params-normal" class="params-container">
+                        <h3>📈 Distribución Normal</h3>
+                        <div class="input-group">
+                            <label for="mu">Media (μ):</label>
+                            <input type="number" id="mu" name="mu" 
+                                value="{{ params.get('mu', 0) if params else 0 }}" 
+                                step="0.1">
                         </div>
+                        <div class="input-group">
+                            <label for="sigma">Desviación estándar (σ):</label>
+                            <input type="number" id="sigma" name="sigma" 
+                                value="{{ params.get('sigma', 1.01) if params else 1 }}" 
+                                min="0.01" step="0.1">
+                        </div>
+                        <div class="formula-box">
+                            <strong>Fórmula:</strong> f(x) = (1/σ√2π) × e<sup>-(x-μ)²/2σ²</sup>
+                        </div>
+                    </div>
 
-                        <div id="params-exponencial" class="params-container">
-                            <h3>⏱ Distribución Exponencial</h3>
-                            <div class="input-group">
-                                <label for="lambda">Tasa (λ):</label>
-                                <input type="number" id="lambda" name="lambda" 
-                                       value="{{ params.lambda if params else 1 }}" 
-                                       min="0.01" step="0.1">
-                            </div>
-                            <div class="formula-box">
-                                <strong>Fórmula:</strong> f(x) = λe<sup>-λx</sup> para x ≥ 0
-                            </div>
+                    <div id="params-exponencial" class="params-container">
+                        <h3>⏱ Distribución Exponencial</h3>
+                        <div class="input-group">
+                            <label for="lambda">Tasa (λ):</label>
+                            <input type="number" id="lambda" name="lambda" 
+                                value="{{ params.get('lambda', 1.01) if params else 1 }}" 
+                                min="0.01" step="0.1">
                         </div>
+                        <div class="formula-box">
+                            <strong>Fórmula:</strong> f(x) = λe<sup>-λx</sup> para x ≥ 0
+                        </div>
+                    </div>
 
-                        <div id="params-uniforme" class="params-container">
-                            <h3>📏 Distribución Uniforme</h3>
-                            <div class="input-group">
-                                <label for="a">Límite inferior (a):</label>
-                                <input type="number" id="a" name="a" 
-                                       value="{{ params.a if params else 0 }}" 
-                                       step="0.1">
-                            </div>
-                            <div class="input-group">
-                                <label for="b">Límite superior (b):</label>
-                                <input type="number" id="b" name="b" 
-                                       value="{{ params.b if params else 1 }}" 
-                                       step="0.1">
-                            </div>
-                            <div class="formula-box">
-                                <strong>Fórmula:</strong> f(x) = 1/(b-a) para a ≤ x ≤ b
-                            </div>
+                    <div id="params-SumaNormal" class="params-container">
+                        <h3>📊 Distribución Suma de Normales</h3>
+                        <div class="input-group">
+                            <label for="mu1">Media 1 (μ₁):</label>
+                            <input type="number" id="mu1" name="mu1" 
+                                value="{{ params.get('mu1', -2) if params else -2 }}" 
+                                step="0.1">
                         </div>
+                        <div class="input-group">
+                            <label for="sigma1">Desv. estándar 1 (σ₁):</label>
+                            <input type="number" id="sigma1" name="sigma1" 
+                                value="{{ params.get('sigma1', 1) if params else 1 }}" 
+                                min="0.01" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="mu2">Media 2 (μ₂):</label>
+                            <input type="number" id="mu2" name="mu2" 
+                                value="{{ params.get('mu2', 2) if params else 2 }}" 
+                                step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="sigma2">Desv. estándar 2 (σ₂):</label>
+                            <input type="number" id="sigma2" name="sigma2" 
+                                value="{{ params.get('sigma2', 1) if params else 1 }}" 
+                                min="0.01" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="peso">Peso de mezcla (w):</label>
+                            <input type="number" id="peso" name="peso" 
+                                value="{{ params.get('peso', 0.5) if params else 0.5 }}" 
+                                min="0" max="1" step="0.1">
+                            <small>Proporción de la primera distribución (0 a 1)</small>
+                        </div>
+                        <div class="formula-box">
+                            <strong>Fórmula:</strong> f(x) = w·N(μ₁,σ₁²) + (1-w)·N(μ₂,σ₂²)
+                        </div>
+                    </div>
 
-                        <div id="params-gamma" class="params-container">
-                            <h3>📊 Distribución Gamma</h3>
-                            <div class="input-group">
-                                <label for="alpha">Forma (α):</label>
-                                <input type="number" id="alpha" name="alpha" 
-                                       value="{{ params.alpha if params else 2 }}" 
-                                       min="0.1" step="0.1">
-                            </div>
-                            <div class="input-group">
-                                <label for="beta">Tasa (β):</label>
-                                <input type="number" id="beta" name="beta" 
-                                       value="{{ params.beta if params else 1 }}" 
-                                       min="0.01" step="0.1">
-                            </div>
-                            <div class="formula-box">
-                                <strong>Fórmula:</strong> f(x) = (β<sup>α</sup>/Γ(α)) × x<sup>α-1</sup> × e<sup>-βx</sup>
-                            </div>
+
+                    <div id="params-uniforme" class="params-container">
+                        <h3>📏 Distribución Uniforme</h3>
+                        <div class="input-group">
+                            <label for="a">Límite inferior (a):</label>
+                            <input type="number" id="a" name="a" 
+                                value="{{ params.get('a', 0) if params else 0 }}" 
+                                step="0.1">
                         </div>
+                        <div class="input-group">
+                            <label for="b">Límite superior (b):</label>
+                            <input type="number" id="b" name="b" 
+                                value="{{ params.get('b', 1.01) if params else 1 }}" 
+                                step="0.1">
+                        </div>
+                        <div class="formula-box">
+                            <strong>Fórmula:</strong> f(x) = 1/(b-a) para a ≤ x ≤ b
+                        </div>
+                    </div>
+
+                    <div id="params-gamma" class="params-container">
+                        <h3>📊 Distribución Gamma</h3>
+                        <div class="input-group">
+                            <label for="alpha">Forma (α):</label>
+                            <input type="number" id="alpha" name="alpha" 
+                                value="{{ params.get('alpha', 2.01) if params else 2 }}" 
+                                min="0.1" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="beta">Tasa (β):</label>
+                            <input type="number" id="beta" name="beta" 
+                                value="{{ params.get('beta', 1.01) if params else 1 }}" 
+                                min="0.01" step="0.1">
+                        </div>
+                        <div class="formula-box">
+                            <strong>Fórmula:</strong> f(x) = (β<sup>α</sup>/Γ(α)) × x<sup>α-1</sup> × e<sup>-βx</sup>
+                        </div>
+                    </div>
 
                         <button type="submit" class="update-button">🔄 Actualizar Simulación</button>
                     </form>
@@ -500,20 +540,30 @@
     </div>
 
     <script>
-        function cambiarDistribucion() {
-            const dist = document.getElementById('distribucion').value;
-            const containers = document.querySelectorAll('.params-container');
-            
-            containers.forEach(container => {
-                container.classList.remove('active');
-            });
-            
-            document.getElementById('params-' + dist).classList.add('active');
-        }
+    function cambiarDistribucion() {
+        const dist = document.getElementById('distribucion').value;
+        const containers = document.querySelectorAll('.params-container');
         
-        window.onload = function() {
-            cambiarDistribucion();
-        };
-    </script>
+        containers.forEach(container => {
+            container.classList.remove('active');
+            const inputs = container.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.disabled = true;
+            });
+        });
+        
+        const activeContainer = document.getElementById('params-' + dist);
+        activeContainer.classList.add('active');
+        
+        const activeInputs = activeContainer.querySelectorAll('input');
+        activeInputs.forEach(input => {
+            input.disabled = false;
+        });
+    }
+    
+    window.onload = function() {
+        cambiarDistribucion();
+    };
+</script>
 </body>
 </html>
